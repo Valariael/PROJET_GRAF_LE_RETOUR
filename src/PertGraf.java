@@ -5,45 +5,157 @@ import java.io.IOException;
 import java.util.*;
 
 public class PertGraf extends Graf {
-
-    @Override
-    public String toString() {
-        return super.toString();
-    }
-
-    /*public static PertGraf create(String path) throws FileNotFoundException, InvalidFormatException {
+    static PertGraf create(String path) throws FileNotFoundException, InvalidFormatException {
         PertGraf pert = new PertGraf();
-        Set<Task> tasks = new HashSet<>();
+        Set<TaskRaw> tasks = new HashSet<>();
 
         FileReader input = new FileReader(path);
         BufferedReader reader = new BufferedReader(input);
-        String line = null;
+        String line;
         try {
             while ((line = reader.readLine()) != null) {
-                String[] details = line.split(",");
+                if (line.startsWith("#")) {
+                    continue;
+                }
+                String[] details = line.trim().split(",");
                 if (details.length < 4) {
                     throw new InvalidFormatException();
                 }
-                String name = details[0];
-                String label = details[1];
-                int weight = 0;
+                String name = details[0].trim();
+                String label = details[1].trim();
+                int weight;
                 try {
-                    weight = Integer.parseInt(details[2]);
-                }catch (NumberFormatException e) {
+                    weight = Integer.parseInt(details[2].trim());
+                } catch (NumberFormatException e) {
                     throw new InvalidFormatException();
                 }
-                List<String> dependencies = new ArrayList<>();
+                Set<String> dependencies = new HashSet<>();
                 for (int i = 3; i < details.length; i++) {
-                    dependencies.add(details[i]);
+                    if (details[i].trim().equals("-")) {
+                        continue;
+                    }
+                    dependencies.add(details[i].trim());
                 }
-                tasks.add(new Task(name, label, weight, dependencies));
+                tasks.add(new TaskRaw(name, label, weight, dependencies));
             }
         } catch (IOException e) {
             e.printStackTrace();
         }
 
-        return null; // Pas fini
-    }*/
+        for (TaskRaw task : tasks) {
+            pert.addNode(new Task(task.getName(), task.getLabel()));
+        }
+        
+        for (TaskRaw task : tasks) {
+            for (TaskRaw taskNext : tasks) {
+                if (task == taskNext) {
+                    continue;
+                }
+                if (taskNext.getDependencies().contains(task.getName())) {
+                    Task fromTask = new Task(task.getName());
+                    Task toTask = new Task(taskNext.getName(), taskNext.getLabel(), task.getWeight());
+                    toTask.setToWeightActivated(true);
+                    pert.addEdge(fromTask, toTask);
+                }
+            }
+        }
+
+        return pert; // Pas fini
+    }
+
+    Task getHighestPriorityTask(HashSet<Task> pending) {
+        //TODO : longest paths distance might be wrong
+        //TODO : add final node to pert to use time of last task
+        List<Edge> allEdges = this.getAllEdges();
+        Map<Deque<Node>, Integer> longestPaths = new HashMap<>();
+        Map<Node, Integer> distances = new HashMap<>();
+        Map<Node, Node> predecessors = new HashMap<>();
+        int numberOfNodes = this.adjList.keySet().size();
+
+        for (Task currentTask : pending) {
+            Deque<Node> currentLongest = new LinkedList<>();
+
+            // init Bellman-Ford
+            this.adjList.forEach((node, successors) -> {
+                distances.put(node, Integer.MIN_VALUE);
+                predecessors.put(node, null);
+            });
+            distances.put(currentTask, 0);
+            predecessors.put(currentTask, currentTask);
+            int iter = 1;
+            boolean modified = true;
+
+            // processing shortest paths
+            while (iter < numberOfNodes && modified) {
+                modified = false;
+
+                for (Edge e : allEdges) {
+                    if (distances.get(e.getTail()) < distances.get(e.getHead()) + e.getWeight()) {
+                        distances.put(e.getTail(), distances.get(e.getHead()) + e.getWeight());
+                        predecessors.put(e.getTail(), e.getHead());
+                        modified = true;
+                    }
+                }
+
+                iter++;
+            }
+
+            // rebuilding longest path from start to end, ending at the furthest
+            Map.Entry<Node, Integer> maxEntry = null;
+            for (Map.Entry<Node, Integer> entry : distances.entrySet()) {
+                if (maxEntry == null || entry.getValue().compareTo(maxEntry.getValue()) > 0) {
+                    maxEntry = entry;
+                }
+            }
+
+            Node currentNode;
+            if (maxEntry != null) {
+                currentNode = maxEntry.getKey();
+                int distance = 0;
+                while (!predecessors.get(currentNode).equals(currentNode)) {
+                    currentLongest.addFirst(currentNode);
+                    distance += distances.get(currentNode);
+                    currentNode = predecessors.get(currentNode);
+                }
+                
+                longestPaths.put(currentLongest, distance);
+            }
+        }
+
+        //take the longest of the longest paths
+        Map.Entry<Deque<Node>, Integer> longestEntry = null;
+        for (Map.Entry<Deque<Node>, Integer> entry : longestPaths.entrySet()) {
+            if (longestEntry == null || entry.getValue().compareTo(longestEntry.getValue()) > 0) {
+                longestEntry = entry;
+            }
+        }
+
+        //return its first task
+        if (longestEntry != null) {
+            return (Task) longestEntry.getKey().getFirst();
+        }
+        return null;
+    }
+
+    /**
+     * Gets a list of all the edges existing in the PERT graph.
+     *
+     * @return A List object containing once each edge of the PERT graph.
+     */
+    public List<Edge> getAllEdges() {
+        List<Edge> edges = new ArrayList<>();
+        for (Map.Entry<Node, ArrayList<Node>> nodeEntry : adjList.entrySet()) {
+            for (Node node : nodeEntry.getValue()) {
+                if(node.isToWeightActivated()) {
+                    edges.add(new PertEdge(nodeEntry.getKey(), node, node.getToLabel()));
+                } else {
+                    edges.add(new PertEdge(nodeEntry.getKey(), node));
+                }
+            }
+        }
+
+        return edges;
+    }
 
     /**
      * Computes a depth-first search starting at the vertex with the lowest 'id'.
@@ -106,5 +218,10 @@ public class PertGraf extends Graf {
         sb.append("}");
 
         return sb.toString();
+    }
+
+    @Override
+    public String toString() {
+        return super.toString();
     }
 }

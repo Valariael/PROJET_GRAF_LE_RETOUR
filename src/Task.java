@@ -24,16 +24,7 @@ public class Task extends Node {
         this.label = label;
     }
 
-    /*List<String> dependencies;
-
-    public Task(String name, String label, int weight, List<String> dependencies) {
-        this.name = name;
-        this.label = label;
-        this.weight = weight;
-        this.dependencies = dependencies;
-    }*/
-
-    public String getLabel() {
+    String getLabel() {
         return label;
     }
 

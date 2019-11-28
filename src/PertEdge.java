@@ -1,9 +1,9 @@
 public class PertEdge extends Edge {
-    public PertEdge(Node head, Node tail, int weight) {
+    PertEdge(Node head, Node tail, int weight) {
         super(head, tail, weight);
     }
 
-    public PertEdge(Node head, Node tail) {
+    PertEdge(Node head, Node tail) {
         super(head, tail);
     }
 
