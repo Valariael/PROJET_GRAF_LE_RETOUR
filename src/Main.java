@@ -26,17 +26,16 @@ public class Main {
             if (s.trim().startsWith("#")) {
                 System.out.println("> commented line read");
             } else {
-                String[] parts = s.split(", ");
+                String[] parts = s.split(",");
                 if(parts.length < 4) throw new InvalidFormatException();
 
-                Task task = new Task(parts[0].trim(), parts[1]);
-                // TODO demander si la liste est toujours ordonnée
+                Task task = new Task(parts[0].trim(), parts[1].trim());
                 p.addNode(task);
-                durations.put(task, Integer.parseInt(parts[2]));
+                durations.put(task, Integer.parseInt(parts[2].trim()));
 
-                if(!parts[3].equals("-")) {
+                if(!parts[3].trim().equals("-")) {
                     for(int i = 3; i < parts.length; i++) {
-                        Task t = new Task(parts[i]);
+                        Task t = new Task(parts[i].trim());
                         Task toTask = new Task(task.getName(), task.getLabel(), durations.get(task));
                         p.addEdge(t, toTask);
                     }
