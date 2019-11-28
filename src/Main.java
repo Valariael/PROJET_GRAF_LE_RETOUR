@@ -36,7 +36,8 @@ public class Main {
                 if(!parts[3].trim().equals("-")) {
                     for(int i = 3; i < parts.length; i++) {
                         Task t = new Task(parts[i].trim());
-                        Task toTask = new Task(task.getName(), task.getLabel(), durations.get(task));
+                        Task toTask = new Task(task.getName(), task.getLabel(), durations.get(t));
+                        toTask.setToWeightActivated(true);
                         p.addEdge(t, toTask);
                     }
                 }
