@@ -50,7 +50,7 @@ public class Task extends Node {
 
     @Override
     public String toString() {
-        return "Task {name: " + this.getName() + " label: " + this.label;
+        return "Task {name: " + this.getName() + " label: " + this.label + "}";
     }
 
     @Override

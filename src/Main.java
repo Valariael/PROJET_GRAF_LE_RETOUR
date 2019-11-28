@@ -9,6 +9,7 @@ public class Main {
         try {
             PertGraf p = getPertFromFile("./src/testFile");
             System.out.println(p.toString());
+            System.out.println(p.toDotString());
         } catch (IOException | InvalidFormatException e) {
             e.printStackTrace();
         }

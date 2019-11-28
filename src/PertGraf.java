@@ -2,10 +2,7 @@ import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 public class PertGraf extends Graf {
 
@@ -48,4 +45,66 @@ public class PertGraf extends Graf {
         return null; // Pas fini
     }*/
 
+    /**
+     * Computes a depth-first search starting at the vertex with the lowest 'id'.
+     *
+     * @return The List of Node objects in the order of the DFS.
+     */
+    @Override
+    public List<Node> getDFS() {
+        Node startingNode = Collections.min(this.adjList.keySet(), Comparator.comparing(Node::hashCode));
+
+        return getDFS(startingNode);
+    }
+
+    /**
+     * Computes a breadth-first search starting at the vertex with the lowest 'id'.
+     *
+     * @return The List of Node objects in the order of the BFS.
+     */
+    @Override
+    public List<Node> getBFS() {
+        Node startingNode = Collections.min(this.adjList.keySet(), Comparator.comparing(Node::hashCode));
+
+        return getBFS(startingNode);
+    }
+
+    /**
+     * Computes the representation of the graph in the DOT formalism.
+     *
+     * @return The String object containing the DOT representation of the graph.
+     */
+    @Override
+    public String toDotString() {
+        StringBuilder sb = new StringBuilder();
+
+        List<Node> lonelyNodes = getAllNodes();
+
+        sb.append("digraph g {\n");
+
+        this.adjList.forEach((nodeFrom, nodeList) -> nodeList.forEach((nodeTo -> {
+            lonelyNodes.remove(nodeFrom);
+            lonelyNodes.remove(nodeTo);
+
+            sb.append(" ");
+
+            sb.append(nodeFrom.getName());
+            sb.append(" -> ");
+            sb.append(nodeTo.getName());
+
+            if(nodeTo.isToWeightActivated()) {
+                sb.append(" [label=");
+                sb.append(nodeTo.getToLabel());
+                sb.append("]");
+            }
+
+            sb.append(";\n");
+        })));
+
+        lonelyNodes.forEach(node -> sb.append(" ").append(node.getName()).append(";\n"));
+
+        sb.append("}");
+
+        return sb.toString();
+    }
 }
