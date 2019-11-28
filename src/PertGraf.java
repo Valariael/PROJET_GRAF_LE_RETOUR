@@ -9,7 +9,12 @@ import java.util.Set;
 
 public class PertGraf extends Graf {
 
-    public static PertGraf create(String path) throws FileNotFoundException, InvalidFormatException {
+    @Override
+    public String toString() {
+        return super.toString();
+    }
+
+    /*public static PertGraf create(String path) throws FileNotFoundException, InvalidFormatException {
         PertGraf pert = new PertGraf();
         Set<Task> tasks = new HashSet<>();
 
@@ -41,6 +46,6 @@ public class PertGraf extends Graf {
         }
 
         return null; // Pas fini
-    }
+    }*/
 
 }
