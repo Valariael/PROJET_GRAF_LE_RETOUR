@@ -1,6 +1,7 @@
 public class Task extends Node {
     private String label;
     private int duration;//TODO implement
+    private int workedTimes;
 
     Task(String name) {
         super(name);
@@ -29,8 +30,20 @@ public class Task extends Node {
         return label;
     }
 
-    public void setLabel(String label) {
+    void setLabel(String label) {
         this.label = label;
+    }
+
+    int getDuration() {
+        return duration;
+    }
+
+    int getWorkedTimes() {
+        return workedTimes;
+    }
+
+    void incrementWorkedTimes() {
+        workedTimes++;
     }
 
     @Override

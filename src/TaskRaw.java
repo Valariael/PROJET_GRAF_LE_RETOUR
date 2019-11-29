@@ -1,7 +1,6 @@
 import java.util.Set;
 
 class TaskRaw {
-
     private String name;
     private String label;
     private int weight;

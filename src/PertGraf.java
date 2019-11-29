@@ -63,9 +63,36 @@ public class PertGraf extends Graf {
         return pert; // Pas fini
     }
 
-    Set<Node> getAvailableTasks(HashSet<Task> done, HashSet<Task> working) {
-        Set<Node> keySet = this.adjList.keySet();
-        HashSet<Node> availableTasks = new HashSet<>(keySet);
+    List<Task> computeListScheduling(int numberOfWorkers) {
+        HashSet<Task> working = new HashSet<>();
+        HashSet<Task> done = new HashSet<>();
+        HashSet<Node> remaining = new HashSet<>(this.adjList.keySet());
+        LinkedList<Task> scheduling = new LinkedList<>();
+
+        while(!remaining.isEmpty()) {
+            while(working.size() < numberOfWorkers && remaining.size() > working.size()) {
+                Task toWork = getHighestPriorityTask(
+                        getPendingTasks(done, working)
+                );
+                working.add(toWork);
+                scheduling.add(toWork);
+            }
+
+            for(Task t : working) {
+                t.incrementWorkedTimes();
+                if(t.getWorkedTimes() == t.getDuration()) {
+                    working.remove(t);
+                    remaining.remove(t);
+                    done.add(t);
+                }
+            }
+        }
+
+        return scheduling;
+    }
+
+    Set<Node> getPendingTasks(HashSet<Task> done, HashSet<Task> working) {
+        HashSet<Node> availableTasks = new HashSet<>(this.adjList.keySet());
 
         for (Map.Entry<Node, ArrayList<Node>> entry : this.adjList.entrySet()) {
             Node nodeFrom = entry.getKey();
@@ -85,7 +112,7 @@ public class PertGraf extends Graf {
 
     boolean checkPertIsTree(){return true;} //TODO implement ? or not ? or checkTaskValid
 
-    Task getHighestPriorityTask(HashSet<Task> pending) {
+    Task getHighestPriorityTask(Set<Node> pending) {
         //TODO : longest paths distance might be wrong
         //TODO : add final node to pert to use time of last task
         List<Edge> allEdges = this.getAllEdges();
@@ -94,7 +121,7 @@ public class PertGraf extends Graf {
         Map<Node, Node> predecessors = new HashMap<>();
         int numberOfNodes = this.adjList.keySet().size();
 
-        for (Task currentTask : pending) {
+        for (Node currentTask : pending) {
             Deque<Node> currentLongest = new LinkedList<>();
 
             // init Bellman-Ford
