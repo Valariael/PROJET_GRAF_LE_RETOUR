@@ -1,5 +1,6 @@
 public class Task extends Node {
     private String label;
+    private int duration;//TODO implement
 
     Task(String name) {
         super(name);

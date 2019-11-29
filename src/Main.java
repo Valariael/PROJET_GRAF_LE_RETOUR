@@ -1,9 +1,6 @@
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Set;
 
 public class Main {
     public static void main(String[] args) {
@@ -15,7 +12,21 @@ public class Main {
             HashSet<Task> pending = new HashSet<>();
             pending.add(new Task("B"));
             pending.add(new Task("D"));
+            System.out.println("highest priority task : ");
             System.out.println(p.getHighestPriorityTask(pending));
+
+            HashSet<Task> done = new HashSet<>();
+            done.add(new Task("A"));
+            done.add(new Task("B"));
+            done.add(new Task("C"));
+            done.add(new Task("D"));
+            done.add(new Task("E"));
+            HashSet<Task> working = new HashSet<>();/*
+            working.add(new Task("D"));
+            working.add(new Task("E"));*/
+            Set<Node> pendingTest = p.getAvailableTasks(done, working);
+            System.out.println("available tasks : ");
+            for(Node n : pendingTest) System.out.println(n);
         } catch (IOException | InvalidFormatException e) {
             e.printStackTrace();
         }

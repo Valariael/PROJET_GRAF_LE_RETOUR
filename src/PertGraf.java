@@ -63,6 +63,28 @@ public class PertGraf extends Graf {
         return pert; // Pas fini
     }
 
+    Set<Node> getAvailableTasks(HashSet<Task> done, HashSet<Task> working) {
+        Set<Node> keySet = this.adjList.keySet();
+        HashSet<Node> availableTasks = new HashSet<>(keySet);
+
+        for (Map.Entry<Node, ArrayList<Node>> entry : this.adjList.entrySet()) {
+            Node nodeFrom = entry.getKey();
+            ArrayList<Node> nodeList = entry.getValue();
+            nodeList.removeAll(done);
+
+            if (done.contains((Task) nodeFrom)) continue;
+
+            availableTasks.removeAll(nodeList);
+        }
+
+        availableTasks.removeAll(done);
+        availableTasks.removeAll(working);
+
+        return availableTasks;
+    }
+
+    boolean checkPertIsTree(){return true;} //TODO implement ? or not ? or checkTaskValid
+
     Task getHighestPriorityTask(HashSet<Task> pending) {
         //TODO : longest paths distance might be wrong
         //TODO : add final node to pert to use time of last task
