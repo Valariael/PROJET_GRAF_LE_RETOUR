@@ -10,8 +10,7 @@ public class Main {
             System.out.println(p.toDotString());
 
             Set<Node> pending = new HashSet<>();
-            pending.add(new Task("B"));
-            pending.add(new Task("D"));
+            pending.add(new Task("E"));
             System.out.println("highest priority task : ");
             System.out.println(p.getHighestPriorityTask(pending));
 
@@ -27,6 +26,8 @@ public class Main {
             Set<Node> pendingTest = p.getPendingTasks(done, working);
             System.out.println("pending tasks : ");
             for(Node n : pendingTest) System.out.println(n);
+            System.out.println("highest priority task : ");
+            System.out.println(p.getHighestPriorityTask(pendingTest));
         } catch (IOException | InvalidFormatException e) {
             e.printStackTrace();
         }

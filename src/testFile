@@ -8,6 +8,6 @@ E, electricity, 2, B
 F, windows, 1, C, D, E
 G, surroundings, 1, D, E
 H, ceiling, 1, F
-I, facade, 4, D, E
+I, facade, 5, D, E
 J, paintings, 2, H
 K, finishing, 1, G, I, J
