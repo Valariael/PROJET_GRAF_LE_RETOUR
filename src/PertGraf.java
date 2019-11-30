@@ -43,7 +43,7 @@ public class PertGraf extends Graf {
         }
 
         for (TaskRaw task : tasks) {
-            pert.addNode(new Task(task.getName(), task.getLabel()));
+            pert.addNode(new Task(task.getName(), task.getLabel(), task.getWeight(), true));
         }
         
         for (TaskRaw task : tasks) {
@@ -53,7 +53,7 @@ public class PertGraf extends Graf {
                 }
                 if (taskNext.getDependencies().contains(task.getName())) {
                     Task fromTask = new Task(task.getName());
-                    Task toTask = new Task(taskNext.getName(), taskNext.getLabel(), task.getWeight());
+                    Task toTask = new Task(taskNext.getName(), taskNext.getLabel(), task.getWeight(), false);
                     toTask.setToWeightActivated(true);
                     pert.addEdge(fromTask, toTask);
                 }
@@ -113,7 +113,6 @@ public class PertGraf extends Graf {
     boolean checkPertIsTree(){return true;} //TODO implement ? or not ? or checkTaskValid
 
     Task getHighestPriorityTask(Set<Node> pending) {
-        //TODO : longest paths distance might be wrong
         //TODO : add final node to pert to use time of last task
         Map<Deque<Node>, Integer> longestPaths = new HashMap<>();
 
@@ -180,14 +179,13 @@ public class PertGraf extends Graf {
         Node currentNode;
         if (maxEntry != null) {
             currentNode = maxEntry.getKey();
-            int distance = 0;
             while (!predecessors.get(currentNode).equals(currentNode)) {
                 longestPath.addFirst(currentNode);
-                distance += distances.get(currentNode);
                 currentNode = predecessors.get(currentNode);
             }
+            longestPath.addFirst(currentNode);
 
-            return new LongestPathInfo<>(longestPath, distance);
+            return new LongestPathInfo<>(longestPath, maxEntry.getValue());
         }
 
         return null;

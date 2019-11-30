@@ -12,18 +12,11 @@ public class Task extends Node {
         this.label = label;
     }
 
-    public Task(int id, String name) {
-        super(id, name);
-    }
-
-    public Task(int id, int toWeight) {
-        super(id, toWeight);
-    }
-
-    Task(String name, String label, int toWeight) {
+    Task(String name, String label, int intValue, boolean isMainNode) {
         super(name);
-        this.setToLabel(toWeight);
         this.label = label;
+        if(isMainNode) this.duration = intValue;
+        else this.setToLabel(intValue);
     }
 
     String getLabel() {
