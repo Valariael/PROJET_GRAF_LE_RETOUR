@@ -63,6 +63,63 @@ public class PertGraf extends Graf {
         return pert; // Pas fini
     }
 
+    Map<Task, Integer> computeEarliestTimes() {
+        List<Edge> allEdges = this.getAllEdges();
+        Map<Node, Integer> distances = new HashMap<>();
+        Map<Node, Node> predecessors = new HashMap<>();
+        int numberOfNodes = this.adjList.keySet().size();
+
+        // init Bellman-Ford
+        this.adjList.forEach((node, successors) -> {
+            distances.put(node, Integer.MIN_VALUE);
+            predecessors.put(node, null);
+        });
+        distances.put(startingNode, 0);
+        predecessors.put(startingNode, startingNode);
+        int iter = 1;
+        boolean modified = true;
+
+        // processing shortest paths
+        while (iter < numberOfNodes && modified) {
+            modified = false;
+
+            for (Edge e : allEdges) {
+                if (distances.get(e.getTail()) < distances.get(e.getHead()) + e.getWeight()) {
+                    distances.put(e.getTail(), distances.get(e.getHead()) + e.getWeight());
+                    predecessors.put(e.getTail(), e.getHead());
+                    modified = true;
+                }
+            }
+
+            iter++;
+        }
+    }
+
+    Task addStartingTask(ArrayList<Node> children) {
+        Task start = new Task("starting_node");
+
+        this.addNode(start);
+        this.adjList.put(start, children);
+
+        return start;
+    }
+
+    Task addEndingTask(List<Task> parents) {
+        Task end = new Task("ending_node");
+
+
+
+        return end;
+    }
+
+    void removeStartingTask(Task endingTask) {
+        this.removeNode(endingTask);
+    }
+
+    void removeEndingTask(Task endingTask) {
+
+    }
+
     List<Task> getStartingTasks() {
         List<Task> startingTasks = new ArrayList<>();
         Set<Node> known = new HashSet<>();
