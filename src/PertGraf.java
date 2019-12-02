@@ -5,6 +5,9 @@ import java.io.IOException;
 import java.util.*;
 
 public class PertGraf extends Graf {
+    private static final String PERT_START_NODE = "starting_node";
+    private static final String PERT_END_NODE = "ending_node";
+
     static PertGraf create(String path) throws FileNotFoundException, InvalidFormatException {
         PertGraf pert = new PertGraf();
         Set<TaskRaw> tasks = new HashSet<>();
@@ -63,19 +66,20 @@ public class PertGraf extends Graf {
         return pert; // Pas fini
     }
 
-    Map<Task, Integer> computeEarliestTimes() {
+    Map<Node, Integer> computeEarliestTimes() { //TODO edit bellman-fords, we dont need iter count
         List<Edge> allEdges = this.getAllEdges();
         Map<Node, Integer> distances = new HashMap<>();
-        Map<Node, Node> predecessors = new HashMap<>();
+        //Map<Node, Node> predecessors = new HashMap<>();
         int numberOfNodes = this.adjList.keySet().size();
+        Task startingNode = new Task(PERT_START_NODE);
 
         // init Bellman-Ford
         this.adjList.forEach((node, successors) -> {
-            distances.put(node, Integer.MIN_VALUE);
-            predecessors.put(node, null);
+            distances.put(node, Integer.MAX_VALUE);
+            //predecessors.put(node, null);
         });
         distances.put(startingNode, 0);
-        predecessors.put(startingNode, startingNode);
+        //predecessors.put(startingNode, startingNode);
         int iter = 1;
         boolean modified = true;
 
@@ -84,19 +88,21 @@ public class PertGraf extends Graf {
             modified = false;
 
             for (Edge e : allEdges) {
-                if (distances.get(e.getTail()) < distances.get(e.getHead()) + e.getWeight()) {
+                if (distances.get(e.getTail()) > distances.get(e.getHead()) + e.getWeight()) {
                     distances.put(e.getTail(), distances.get(e.getHead()) + e.getWeight());
-                    predecessors.put(e.getTail(), e.getHead());
+                    //predecessors.put(e.getTail(), e.getHead());
                     modified = true;
                 }
             }
 
             iter++;
         }
+
+        return distances;
     }
 
     Task addStartingTask(ArrayList<Node> children) {
-        Task start = new Task("starting_node");
+        Task start = new Task(PERT_START_NODE);
 
         this.addNode(start);
         this.adjList.put(start, children);
@@ -105,19 +111,18 @@ public class PertGraf extends Graf {
     }
 
     Task addEndingTask(List<Task> parents) {
-        Task end = new Task("ending_node");
+        Task end = new Task(PERT_END_NODE);
+        end.setToWeightActivated(true);
 
-
+        this.addNode(end);
+        for (Map.Entry<Node, ArrayList<Node>> entry : this.adjList.entrySet()) {
+            if(parents.contains((Task) entry.getKey())) {
+                end.setToLabel(((Task) entry.getKey()).getDuration());
+                entry.getValue().add(end);
+            }
+        }
 
         return end;
-    }
-
-    void removeStartingTask(Task endingTask) {
-        this.removeNode(endingTask);
-    }
-
-    void removeEndingTask(Task endingTask) {
-
     }
 
     List<Task> getStartingTasks() {
