@@ -71,7 +71,8 @@ public class PertGraf extends Graf {
         Map<Node, Integer> distances = new HashMap<>();
         //Map<Node, Node> predecessors = new HashMap<>();
         int numberOfNodes = this.adjList.keySet().size();
-        Task startingNode = new Task(PERT_START_NODE);
+        Task startingNode = addStartingTask(getStartingTasks()); //TODO keep starting node in pert ?
+        Task endingNode = addEndingTask(getEndingTasks());
 
         // init Bellman-Ford
         this.adjList.forEach((node, successors) -> {
@@ -98,10 +99,13 @@ public class PertGraf extends Graf {
             iter++;
         }
 
+        removeNode(startingNode);
+        removeNode(endingNode);
+
         return distances;
     }
 
-    Task addStartingTask(ArrayList<Node> children) {
+    private Task addStartingTask(ArrayList<Node> children) {
         Task start = new Task(PERT_START_NODE);
 
         this.addNode(start);
@@ -110,12 +114,13 @@ public class PertGraf extends Graf {
         return start;
     }
 
-    Task addEndingTask(List<Task> parents) {
+    private Task addEndingTask(ArrayList<Task> parents) {
         Task end = new Task(PERT_END_NODE);
         end.setToWeightActivated(true);
 
         this.addNode(end);
         for (Map.Entry<Node, ArrayList<Node>> entry : this.adjList.entrySet()) {
+            //noinspection RedundantCast
             if(parents.contains((Task) entry.getKey())) {
                 end.setToLabel(((Task) entry.getKey()).getDuration());
                 entry.getValue().add(end);
@@ -125,8 +130,8 @@ public class PertGraf extends Graf {
         return end;
     }
 
-    List<Task> getStartingTasks() {
-        List<Task> startingTasks = new ArrayList<>();
+    private ArrayList<Node> getStartingTasks() {
+        ArrayList<Node> startingTasks = new ArrayList<>();
         Set<Node> known = new HashSet<>();
 
         for (ArrayList<Node> values : this.adjList.values()) {
@@ -134,14 +139,14 @@ public class PertGraf extends Graf {
         }
 
         for(Node n : this.adjList.keySet()) {
-            if(!known.contains(n)) startingTasks.add((Task) n);
+            if(!known.contains(n)) startingTasks.add(n);
         }
 
         return startingTasks;
     }
 
-    List<Task> getEndingTasks() {
-        List<Task> endingTasks = new ArrayList<>();
+    private ArrayList<Task> getEndingTasks() {
+        ArrayList<Task> endingTasks = new ArrayList<>();
 
         for (Map.Entry<Node, ArrayList<Node>> entry : this.adjList.entrySet()) {
             if(entry.getValue().isEmpty()) endingTasks.add((Task) entry.getKey());
@@ -178,7 +183,7 @@ public class PertGraf extends Graf {
         return scheduling;
     }
 
-    Set<Node> getPendingTasks(HashSet<Task> done, HashSet<Task> working) {
+    private Set<Node> getPendingTasks(HashSet<Task> done, HashSet<Task> working) {
         HashSet<Node> availableTasks = new HashSet<>(this.adjList.keySet());
 
         for (Map.Entry<Node, ArrayList<Node>> entry : this.adjList.entrySet()) {
@@ -186,6 +191,7 @@ public class PertGraf extends Graf {
             ArrayList<Node> nodeList = entry.getValue();
             nodeList.removeAll(done);
 
+            //noinspection RedundantCast
             if (done.contains((Task) nodeFrom)) continue;
 
             availableTasks.removeAll(nodeList);
@@ -199,7 +205,7 @@ public class PertGraf extends Graf {
 
     boolean checkPertIsTree(){return true;} //TODO implement ? or not ? or checkTaskValid
 
-    Task getHighestPriorityTask(Set<Node> pending) {
+    private Task getHighestPriorityTask(Set<Node> pending) {
         //TODO : add final node to pert to use time of last task
         Map<Deque<Node>, Integer> longestPaths = new HashMap<>();
 
@@ -223,7 +229,7 @@ public class PertGraf extends Graf {
         return null;
     }
 
-    LongestPathInfo<Deque<Node>, Integer> computeLongestPathFrom(Node startingNode) { //TODO support multiple longest paths
+    private LongestPathInfo<Deque<Node>, Integer> computeLongestPathFrom(Node startingNode) { //TODO support multiple longest paths
         List<Edge> allEdges = this.getAllEdges();
         Map<Node, Integer> distances = new HashMap<>();
         Map<Node, Node> predecessors = new HashMap<>();
@@ -275,7 +281,7 @@ public class PertGraf extends Graf {
             return new LongestPathInfo<>(longestPath, maxEntry.getValue());
         }
 
-        return null;
+        return new LongestPathInfo<>(longestPath, null);
     }
 
     /**
