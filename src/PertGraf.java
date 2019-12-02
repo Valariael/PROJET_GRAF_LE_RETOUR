@@ -63,6 +63,31 @@ public class PertGraf extends Graf {
         return pert; // Pas fini
     }
 
+    List<Task> getStartingTasks() {
+        List<Task> startingTasks = new ArrayList<>();
+        Set<Node> known = new HashSet<>();
+
+        for (ArrayList<Node> values : this.adjList.values()) {
+            known.addAll(values);
+        }
+
+        for(Node n : this.adjList.keySet()) {
+            if(!known.contains(n)) startingTasks.add((Task) n);
+        }
+
+        return startingTasks;
+    }
+
+    List<Task> getEndingTasks() {
+        List<Task> endingTasks = new ArrayList<>();
+
+        for (Map.Entry<Node, ArrayList<Node>> entry : this.adjList.entrySet()) {
+            if(entry.getValue().isEmpty()) endingTasks.add((Task) entry.getKey());
+        }
+
+        return endingTasks;
+    }
+
     List<Task> computeListScheduling(int numberOfWorkers) {
         HashSet<Task> working = new HashSet<>();
         HashSet<Task> done = new HashSet<>();
@@ -136,7 +161,7 @@ public class PertGraf extends Graf {
         return null;
     }
 
-    LongestPathInfo<Deque<Node>, Integer> computeLongestPathFrom(Node startingNode) {
+    LongestPathInfo<Deque<Node>, Integer> computeLongestPathFrom(Node startingNode) { //TODO support multiple longest paths
         List<Edge> allEdges = this.getAllEdges();
         Map<Node, Integer> distances = new HashMap<>();
         Map<Node, Node> predecessors = new HashMap<>();
@@ -217,7 +242,7 @@ public class PertGraf extends Graf {
      * @return The List of Node objects in the order of the DFS.
      */
     @Override
-    public List<Node> getDFS() {
+    public List<Node> getDFS() { //TODO remove ?
         Node startingNode = Collections.min(this.adjList.keySet(), Comparator.comparing(Node::hashCode));
 
         return getDFS(startingNode);
