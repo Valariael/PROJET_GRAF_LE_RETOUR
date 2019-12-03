@@ -10,6 +10,14 @@ public class Main {
             System.out.println(p.toString());
             System.out.println(p.toDotString());
 
+            List<List<Node>> paths = p.computeCriticalPaths();
+            for (List<Node> list : paths) {
+                System.out.println("Path: ");
+                for (Node node : list) {
+                    System.out.println(node.getName() + " -> ");
+                }
+            }
+
             /*Set<Node> pending = new HashSet<>();
             pending.add(new Task("E"));
             System.out.println("highest priority task : ");

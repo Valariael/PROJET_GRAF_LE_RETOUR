@@ -105,6 +105,91 @@ public class PertGraf extends Graf {
         return distances;
     }
 
+    Map<Node, Integer> computeLatestTimes() {
+        List<Edge> allEdges = this.getAllEdges();
+        Map<Node, Integer> distances = new HashMap<>();
+        Map<Node, Node> predecessors = new HashMap<>();
+        int numberOfNodes = this.adjList.keySet().size();
+
+        // init Bellman-Ford
+        this.adjList.forEach((node, successors) -> {
+            distances.put(node, Integer.MIN_VALUE);
+            predecessors.put(node, null);
+        });
+
+        Task startingNode = addStartingTask(getStartingTasks());
+        distances.put(startingNode, 0);
+        predecessors.put(startingNode, startingNode);
+        int iter = 1;
+        boolean modified = true;
+
+        // processing shortest paths
+        while (iter < numberOfNodes && modified) {
+            modified = false;
+
+            for (Edge e : allEdges) {
+                if (distances.get(e.getTail()) < distances.get(e.getHead()) + e.getWeight()) {
+                    distances.put(e.getTail(), distances.get(e.getHead()) + e.getWeight());
+                    modified = true;
+                }
+            }
+
+            iter++;
+        }
+
+        return distances;
+    }
+
+    public PertGraf getReversePert() {
+        PertGraf reverse = new PertGraf();
+
+        // adding all nodes to the soon-to-be reversed graph
+        for(Node n : this.getAllNodes()) reverse.addNode(new Task(((Task)n).getName()));
+
+        // recreating all edges but with head and tail inverted
+        this.adjList.forEach((nodeFrom, nodeList) -> nodeList.forEach((nodeTo) -> {
+            nodeFrom.setToLabel(nodeTo.getToLabel());
+            nodeFrom.setToWeightActivated(true);
+            nodeTo.setToLabel(1);
+            nodeTo.setToWeightActivated(false);
+            reverse.addEdge(nodeTo, nodeFrom);
+        }));
+
+        return reverse;
+    }
+
+    void computeCriticalPathsRec(List<List<Node>> paths, List<Node> currentPath, Map<Node, Integer> earliestTimes, Map<Node, Integer> latestTimes, List<Node> currentNode) {
+        boolean found = false;
+        for (Node node : currentNode) {
+            if (earliestTimes.get(node) == latestTimes.get(node)) {
+                if (!found) {
+                    currentPath.add(node);
+                    computeCriticalPathsRec(paths, currentPath, earliestTimes, latestTimes, adjList.get(node));
+                    found = true;
+                }
+                else {
+                    List<Node> newPath = new ArrayList<>();
+                    newPath.addAll(currentPath);
+                    paths.add(newPath);
+                    computeCriticalPathsRec(paths, newPath, earliestTimes, latestTimes, adjList.get(node));
+                }
+            }
+        }
+    }
+
+    List<List<Node>> computeCriticalPaths() {
+        Map<Node, Integer> earliestTimesReverse = getReversePert().computeEarliestTimes();
+        Map<Node, Integer> latestTimes = computeLatestTimes();
+        List<List<Node>> criticalsPaths = new ArrayList<>();
+        ArrayList<Node> startingTasks = getStartingTasks();
+
+        List<Node> path = new ArrayList<>();
+        criticalsPaths.add(path);
+        computeCriticalPathsRec(criticalsPaths, path, earliestTimesReverse, latestTimes, startingTasks);
+
+        return criticalsPaths;
+    }
+
     private Task addStartingTask(ArrayList<Node> children) {
         Task start = new Task(PERT_START_NODE);
 
