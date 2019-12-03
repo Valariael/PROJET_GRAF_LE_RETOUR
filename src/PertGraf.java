@@ -224,7 +224,7 @@ public class PertGraf extends Graf {
         removeEndingTask();
         for(Map.Entry<Node, Integer> entry : latestTimes.entrySet()) {
             entry.setValue(entry.getValue() - endingNode.getToLabel());
-        }
+        }//TODO: ATTENTION GRUGAGE EN PUISSANCE
         System.out.println("Latest...");
         for (Map.Entry<Node, Integer> entry : latestTimes.entrySet()) {
             System.out.println(entry.getKey().getName() + " : " + entry.getValue());
