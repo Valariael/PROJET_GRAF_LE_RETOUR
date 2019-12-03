@@ -1,7 +1,5 @@
 import java.io.IOException;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 public class Main {
     public static void main(String[] args) {
@@ -28,11 +26,13 @@ public class Main {
             System.out.println("pending tasks : ");
             for(Node n : pendingTest) System.out.println(n);
             System.out.println("highest priority task : ");
-            System.out.println(p.getHighestPriorityTask(pendingTest));*/
+            System.out.println(p.getHighestPriorityTask(pendingTest));
 
             List<Task> scheduling = p.computeListScheduling(1);
             System.out.println("scheduling for 1 worker : ");
-            for(Task n : scheduling) System.out.print(n + "  ");
+            for(Task n : scheduling) System.out.print(n + "  ");*/
+            System.out.println("earliest times : ");
+            for(Map.Entry e : p.computeEarliestTimes().entrySet()) System.out.print(e.getKey() + " > " + e.getValue() + "   ");
 
         } catch (IOException | InvalidFormatException e) {
             e.printStackTrace();
