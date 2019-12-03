@@ -179,7 +179,15 @@ public class PertGraf extends Graf {
 
     List<List<Node>> computeCriticalPaths() {
         Map<Node, Integer> earliestTimesReverse = getReversePert().computeEarliestTimes();
+        System.out.println("Earliest...");
+        for (Map.Entry<Node, Integer> entry : earliestTimesReverse.entrySet()) {
+            System.out.println(entry.getKey().getName() + " : " + entry.getValue());
+        }
         Map<Node, Integer> latestTimes = computeLatestTimes();
+        System.out.println("Latest...");
+        for (Map.Entry<Node, Integer> entry : latestTimes.entrySet()) {
+            System.out.println(entry.getKey().getName() + " : " + entry.getValue());
+        }
         List<List<Node>> criticalsPaths = new ArrayList<>();
         ArrayList<Node> startingTasks = getStartingTasks();
 
