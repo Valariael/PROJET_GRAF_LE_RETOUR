@@ -31,6 +31,10 @@ public class Task extends Node {
         return duration;
     }
 
+    public void setDuration(int duration) {
+        this.duration = duration;
+    }
+
     int getWorkedTimes() {
         return workedTimes;
     }

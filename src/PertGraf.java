@@ -67,20 +67,20 @@ public class PertGraf extends Graf {
     }
 
     Map<Node, Integer> computeEarliestTimes() { //TODO edit bellman-fords, we dont need iter count
-        List<Edge> allEdges = this.getAllEdges();
         Map<Node, Integer> distances = new HashMap<>();
-        //Map<Node, Node> predecessors = new HashMap<>();
+        Map<Node, Node> predecessors = new HashMap<>();
         int numberOfNodes = this.adjList.keySet().size();
         Task startingNode = addStartingTask(getStartingTasks()); //TODO keep starting node in pert ?
-        Task endingNode = addEndingTask(getEndingTasks());
+        addEndingTask(getEndingTasks());
+        List<Edge> allEdges = this.getAllEdges();
 
         // init Bellman-Ford
         this.adjList.forEach((node, successors) -> {
             distances.put(node, Integer.MAX_VALUE);
-            //predecessors.put(node, null);
+            predecessors.put(node, null);
         });
         distances.put(startingNode, 0);
-        //predecessors.put(startingNode, startingNode);
+        predecessors.put(startingNode, startingNode);
         int iter = 1;
         boolean modified = true;
 
@@ -90,8 +90,8 @@ public class PertGraf extends Graf {
 
             for (Edge e : allEdges) {
                 if (distances.get(e.getTail()) > distances.get(e.getHead()) + e.getWeight()) {
-                    distances.put(e.getTail(), distances.get(e.getHead()) + e.getWeight());
-                    //predecessors.put(e.getTail(), e.getHead());
+                    if(distances.get(e.getHead()) != Integer.MAX_VALUE) distances.put(e.getTail(), distances.get(e.getHead()) + e.getWeight());
+                    predecessors.put(e.getTail(), e.getHead());
                     modified = true;
                 }
             }
@@ -100,7 +100,7 @@ public class PertGraf extends Graf {
         }
 
         removeNode(startingNode);
-        removeNode(endingNode);
+        removeEndingTask();
 
         return distances;
     }
@@ -192,6 +192,12 @@ public class PertGraf extends Graf {
 
     private Task addStartingTask(ArrayList<Node> children) {
         Task start = new Task(PERT_START_NODE);
+        start.setDuration(0);
+
+        for(Node n : children) {
+            n.setToWeightActivated(true);
+            n.setToLabel(0);
+        }
 
         this.addNode(start);
         this.adjList.put(start, children);
@@ -215,15 +221,23 @@ public class PertGraf extends Graf {
         return end;
     }
 
+    private void removeEndingTask() {
+        Task end = new Task(PERT_END_NODE);
+
+        for (Map.Entry<Node, ArrayList<Node>> entry : this.adjList.entrySet()) {
+            entry.getValue().remove(end);
+        }
+    }
+
     private ArrayList<Node> getStartingTasks() {
         ArrayList<Node> startingTasks = new ArrayList<>();
-        Set<Node> known = new HashSet<>();
+        HashSet<Node> known = new HashSet<>();
 
-        for (ArrayList<Node> values : this.adjList.values()) {
-            known.addAll(values);
+        for(Node n : getAllNodes()) {
+            known.addAll(this.adjList.get(n));
         }
 
-        for(Node n : this.adjList.keySet()) {
+        for(Node n : getAllNodes()) {
             if(!known.contains(n)) startingTasks.add(n);
         }
 
