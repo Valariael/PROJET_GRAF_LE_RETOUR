@@ -4,7 +4,7 @@ public class PertEdge extends Edge {
     }
 
     PertEdge(Node head, Node tail) {
-        super(head, tail);
+        super(head, tail, 0);
     }
 
     @Override

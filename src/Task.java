@@ -12,11 +12,17 @@ public class Task extends Node {
         this.label = label;
     }
 
-    Task(String name, String label, int intValue, boolean isMainNode) {
+    Task(String name, String label, int duration) {
         super(name);
         this.label = label;
-        if(isMainNode) this.duration = intValue;
-        else this.setToLabel(intValue);
+        this.duration = duration;
+    }
+
+    Task(String name, String label, int duration, int toLabel) {
+        super(name);
+        this.label = label;
+        this.duration = duration;
+        this.setToLabel(toLabel);
     }
 
     String getLabel() {
@@ -31,7 +37,7 @@ public class Task extends Node {
         return duration;
     }
 
-    public void setDuration(int duration) {
+    void setDuration(int duration) {
         this.duration = duration;
     }
 

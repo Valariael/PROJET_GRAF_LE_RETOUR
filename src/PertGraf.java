@@ -62,7 +62,7 @@ public class PertGraf extends Graf {
         }
 
         for (TaskRaw task : tasks) {
-            pert.addNode(new Task(task.getName(), task.getLabel(), task.getWeight(), true));
+            pert.addNode(new Task(task.getName(), task.getLabel(), task.getWeight()));
         }
         
         for (TaskRaw task : tasks) {
@@ -72,7 +72,7 @@ public class PertGraf extends Graf {
                 }
                 if (taskNext.getDependencies().contains(task.getName())) {
                     Task fromTask = new Task(task.getName());
-                    Task toTask = new Task(taskNext.getName(), taskNext.getLabel(), task.getWeight(), false);
+                    Task toTask = new Task(taskNext.getName(), taskNext.getLabel(), taskNext.getWeight(), task.getWeight());
                     toTask.setToWeightActivated(true);
                     pert.addEdge(fromTask, toTask);
                 }
@@ -148,7 +148,7 @@ public class PertGraf extends Graf {
         int iter = 1;
         boolean modified = true;
 
-        // processing shortest paths
+        // processing longest paths
         while (iter < numberOfNodes && modified) {
             modified = false;
 
@@ -174,15 +174,16 @@ public class PertGraf extends Graf {
         PertGraf reverse = new PertGraf();
 
         // adding all nodes to the soon-to-be reversed graph
-        for(Node n : this.getAllNodes()) reverse.addNode(new Task(((Task)n).getName()));
+        for(Node n : this.getAllNodes()) {
+            Task task = (Task) n;
+            reverse.addNode(new Task(task.getName(), task.getLabel(), task.getDuration()));
+        }
 
         // recreating all edges but with head and tail inverted
         this.adjList.forEach((nodeFrom, nodeList) -> nodeList.forEach((nodeTo) -> {
-            nodeFrom.setToLabel(nodeTo.getToLabel());
-            nodeFrom.setToWeightActivated(true);
-            nodeTo.setToLabel(1);
-            nodeTo.setToWeightActivated(false);
-            reverse.addEdge(nodeTo, nodeFrom);
+            Task newNodeTo = new Task(nodeFrom.getName(), ((Task) nodeFrom).getLabel(), ((Task) nodeFrom).getDuration(), nodeTo.getToLabel());
+            newNodeTo.setToWeightActivated(true);
+            reverse.addEdge(new Task(nodeTo.getName()), newNodeTo);
         }));
 
         return reverse;
@@ -206,25 +207,29 @@ public class PertGraf extends Graf {
         }
     }
 
-    List<List<Node>> computeCriticalPaths() {
-        Task startingNode = addStartingTask(getStartingTasks()); //TODO keep starting node in pert ?
-        Task endingNode = addEndingTask(getEndingTasks());
+    List<List<Node>> computeCriticalPaths() { //TODO keep starting node in pert ?
         PertGraf reversed = getReversePert();
-        ArrayList<Node> nodeList = reversed.adjList.get(endingNode);
-        reversed.adjList.put(endingNode, reversed.adjList.get(startingNode));
-        reversed.adjList.put(startingNode, nodeList);
+        reversed.addStartingTask(reversed.getStartingTasks());
+        reversed.addEndingTask(reversed.getEndingTasks());
         Map<Node, Integer> earliestTimesReverse = reversed.computeEarliestTimes(false);
-
 
         System.out.println("Earliest...");
         for (Map.Entry<Node, Integer> entry : earliestTimesReverse.entrySet()) {
             System.out.println(entry.getKey().getName() + " : " + entry.getValue());
         }
-        Map<Node, Integer> latestTimes = getReversePert().computeLatestTimes(false);
+        Task startingNode = addStartingTask(getStartingTasks());
+        Task endingNode = addEndingTask(getEndingTasks());
+        Map<Node, Integer> latestTimes = computeLatestTimes(false);
+        removeNode(startingNode);
+        removeEndingTask();
+        for(Map.Entry<Node, Integer> entry : latestTimes.entrySet()) {
+            entry.setValue(entry.getValue() - endingNode.getToLabel());
+        }
         System.out.println("Latest...");
         for (Map.Entry<Node, Integer> entry : latestTimes.entrySet()) {
             System.out.println(entry.getKey().getName() + " : " + entry.getValue());
         }
+
         List<List<Node>> criticalsPaths = new ArrayList<>();
         ArrayList<Node> startingTasks = getStartingTasks();
 
@@ -241,7 +246,7 @@ public class PertGraf extends Graf {
 
         for(Node n : children) {
             n.setToWeightActivated(true);
-            n.setToLabel(0);
+            n.setToLabel(start.getDuration());
         }
 
         this.addNode(start);
@@ -252,13 +257,14 @@ public class PertGraf extends Graf {
 
     private Task addEndingTask(ArrayList<Task> parents) {
         Task end = new Task(PERT_END_NODE);
-        end.setToWeightActivated(true);
 
         this.addNode(end);
         for (Map.Entry<Node, ArrayList<Node>> entry : this.adjList.entrySet()) {
-            //noinspection RedundantCast
-            if(parents.contains((Task) entry.getKey())) {
-                end.setToLabel(((Task) entry.getKey()).getDuration());
+            Task parent = (Task) entry.getKey();
+
+            if(parents.contains(parent)) {
+                end.setToLabel(parent.getDuration());
+                end.setToWeightActivated(true);
                 entry.getValue().add(end);
             }
         }
@@ -437,10 +443,14 @@ public class PertGraf extends Graf {
         List<Edge> edges = new ArrayList<>();
         for (Map.Entry<Node, ArrayList<Node>> nodeEntry : adjList.entrySet()) {
             for (Node node : nodeEntry.getValue()) {
-                if(node.isToWeightActivated()) {
-                    edges.add(new PertEdge(nodeEntry.getKey(), node, node.getToLabel()));
+                if(node.getToLabel() == ((Task) node).getDuration() || node.getName().equals(PERT_END_NODE)) {
+                    edges.add(new PertEdge(nodeEntry.getKey(), node, ((Task) node).getDuration()));
+                } else if (node.getToLabel() != ((Task) node).getDuration() && node.getName().equals(PERT_START_NODE)) {
+                    edges.add(new PertEdge(nodeEntry.getKey(), node, nodeEntry.getKey().getToLabel()));
+                } else if (node.getToLabel() == ((Task) nodeEntry.getKey()).getDuration() && nodeEntry.getKey().getName().equals(PERT_START_NODE)) {
+                    edges.add(new PertEdge(nodeEntry.getKey(), node, nodeEntry.getKey().getToLabel()));
                 } else {
-                    edges.add(new PertEdge(nodeEntry.getKey(), node));
+                    edges.add(new PertEdge(nodeEntry.getKey(), node, ((Task) nodeEntry.getKey()).getDuration()));
                 }
             }
         }
