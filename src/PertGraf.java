@@ -7,12 +7,13 @@ import java.util.*;
 public class PertGraf extends Graf {
     private static final String PERT_START_NODE = "starting_node";
     private static final String PERT_END_NODE = "ending_node";
+    private static final String DOT_SEPARATOR = "==";
 
     private static PertGraf pertInstance = null;
 
     private PertGraf() {}
 
-    public static PertGraf getInstance()
+    static PertGraf getInstance()
     {
         if (pertInstance == null)
         {   pertInstance = new PertGraf();
@@ -24,8 +25,7 @@ public class PertGraf extends Graf {
         pertInstance = p;
     }
 
-    static PertGraf create(String path) throws FileNotFoundException, InvalidFormatException {
-        PertGraf pert = new PertGraf();
+    static PertGraf createFromPertFile(String path) throws FileNotFoundException, InvalidFormatException {
         Set<TaskRaw> tasks = new HashSet<>();
 
         FileReader input = new FileReader(path);
@@ -33,40 +33,63 @@ public class PertGraf extends Graf {
         String line;
         try {
             while ((line = reader.readLine()) != null) {
-                if (line.startsWith("#")) {
-                    continue;
-                }
-                String[] details = line.trim().split(",");
-                if (details.length < 4) {
-                    throw new InvalidFormatException();
-                }
-                String name = details[0].trim();
-                String label = details[1].trim();
-                int weight;
-                try {
-                    weight = Integer.parseInt(details[2].trim());
-                } catch (NumberFormatException e) {
-                    throw new InvalidFormatException();
-                }
-                Set<String> dependencies = new HashSet<>();
-                for (int i = 3; i < details.length; i++) {
-                    if (details[i].trim().equals("-")) {
-                        continue;
-                    }
-                    dependencies.add(details[i].trim());
-                }
-                tasks.add(new TaskRaw(name, label, weight, dependencies));
+                tasks.add(computePertLine(line));
             }
         } catch (IOException e) {
             e.printStackTrace();
+            return null;
+        }
+
+        return createPertGrafFromTaskRawList(tasks); // TODO : Pas fini >> AH!
+    }
+
+    static PertGraf createFromDotFile(String path) throws FileNotFoundException {
+        StringBuilder sb = new StringBuilder();
+
+        FileReader input = new FileReader(path);
+        BufferedReader reader = new BufferedReader(input);
+        String line;
+        try {
+            while ((line = reader.readLine()) != null) {
+                sb.append(line);
+                sb.append("\n");
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
+
+        return createPertGrafFromDotString(sb.toString()); // TODO : Pas fini >> AH!
+    }
+
+    static PertGraf createPertGrafFromPertString(String pertString) {
+        String[] pertStringLines = pertString.split("\n");
+        Set<TaskRaw> tasks = new HashSet<>();
+
+        try {
+            for (String pertStringLine : pertStringLines) {
+                tasks.add(computePertLine(pertStringLine));
+            }
+        } catch (InvalidFormatException e) {
+            e.printStackTrace();
+            return null;
+        }
+
+        return createPertGrafFromTaskRawList(tasks);
+    }
+
+    private static PertGraf createPertGrafFromTaskRawList(Set<TaskRaw> tasks) {
+        PertGraf pert = new PertGraf();
+
+        for (TaskRaw task : tasks) {
+            if(task == null) continue;
+            pert.addNode(new Task(task.getName(), task.getLabel(), task.getWeight()));
         }
 
         for (TaskRaw task : tasks) {
-            pert.addNode(new Task(task.getName(), task.getLabel(), task.getWeight()));
-        }
-        
-        for (TaskRaw task : tasks) {
+            if(task == null) continue;
             for (TaskRaw taskNext : tasks) {
+                if(taskNext == null) continue;
                 if (task == taskNext) {
                     continue;
                 }
@@ -79,7 +102,73 @@ public class PertGraf extends Graf {
             }
         }
 
-        return pert; // Pas fini
+        return pert;
+    }
+
+    static PertGraf createPertGrafFromDotString(String dotString) {
+        PertGraf p = new PertGraf();
+        String[] dotStringLines = dotString.split("\n");
+
+        for(String s : dotStringLines) {
+            if (s.length() <= 9) {
+                System.out.println("> empty line read");
+            } else if (s.contains("#")) {
+                System.out.println("> commented line read");
+            } else if (s.contains("digraph")) {
+                p = new PertGraf();
+            } else {
+                String[] parts = s.split(" ");
+                int start = 0;
+                if (s.startsWith(" ")) {
+                    start = 1;
+                }
+
+                String labelString = parts[start + 3].substring(7, parts[start + 3].length() - 2);
+                String[] labelStringParts = labelString.split(DOT_SEPARATOR);
+                Task from = new Task(parts[start], labelStringParts[1], Integer.parseInt(labelStringParts[0]));
+                Task to;
+                to = new Task(parts[start + 2], labelStringParts[3], Integer.parseInt(labelStringParts[2]), Integer.parseInt(labelStringParts[4]));
+
+                if (!p.adjList.containsKey(from)) {
+                    p.addNode(from);
+                }
+
+                if (!p.adjList.containsKey(to)) {
+                    p.addNode(to);
+                }
+
+                p.addEdge(from, to);
+            }
+        }
+
+        return p;
+    }
+
+    private static TaskRaw computePertLine(String line) throws InvalidFormatException
+    {
+        if (line.startsWith("#")) {
+            return null;
+        }
+        String[] details = line.trim().split(",");
+        if (details.length < 4) {
+            throw new InvalidFormatException();
+        }
+        String name = details[0].trim();
+        String label = details[1].trim();
+        int weight;
+        try {
+            weight = Integer.parseInt(details[2].trim());
+        } catch (NumberFormatException e) {
+            throw new InvalidFormatException();
+        }
+        Set<String> dependencies = new HashSet<>();
+        for (int i = 3; i < details.length; i++) {
+            if (details[i].trim().equals("-")) {
+                continue;
+            }
+            dependencies.add(details[i].trim());
+        }
+        return new TaskRaw(name, label, weight, dependencies);
     }
 
     Map<Node, Integer> computeEarliestTimes(boolean startingEndingNotAdded) { //TODO edit bellman-fords, we dont need iter count
@@ -507,6 +596,14 @@ public class PertGraf extends Graf {
 
             if(nodeTo.isToWeightActivated()) {
                 sb.append(" [label=");
+                sb.append(((Task) nodeFrom).getDuration());
+                sb.append(DOT_SEPARATOR);
+                sb.append(((Task) nodeFrom).getLabel());
+                sb.append(DOT_SEPARATOR);
+                sb.append(((Task) nodeTo).getDuration());
+                sb.append(DOT_SEPARATOR);
+                sb.append(((Task) nodeTo).getLabel());
+                sb.append(DOT_SEPARATOR);
                 sb.append(nodeTo.getToLabel());
                 sb.append("]");
             }
@@ -519,6 +616,26 @@ public class PertGraf extends Graf {
         sb.append("}");
 
         return sb.toString();
+    }
+
+    String[] getPertSuccessorArray()
+    {
+        ArrayList<Node> nodes = new ArrayList<>(this.getAllNodes());
+        List<String> list = new ArrayList<>();
+        nodes.sort(Comparator.comparing(Node::hashCode));
+        nodes.forEach((node) -> {
+            ArrayList<Node> successors = this.adjList.get(node);
+            successors.forEach((nodeTo) -> list.add(nodeTo.getName()));
+            list.add("0");
+        });
+        list.remove(list.size() - 1);
+        String[] array = new String[list.size()];
+
+        for(int i = 0; i < list.size(); ++i) {
+            array[i] = list.get(i);
+        }
+
+        return array;
     }
 
     @Override

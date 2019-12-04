@@ -10,6 +10,7 @@
        <MenuBar BorderPane.alignment="CENTER">
            <Menu mnemonicParsing="false" text="New graph">
                <MenuItem fx:id="menuNewFromDot" mnemonicParsing="false" text="From DOT file"/>
+               <MenuItem fx:id="menuNewFromPert" mnemonicParsing="false" text="From PERT file"/>
                <MenuItem fx:id="menuNewWithRange" mnemonicParsing="false" text="With range of nodes"/>
                <MenuItem fx:id="menuNewEmpty" mnemonicParsing="false" text="Empty"/>
            </Menu>
@@ -18,14 +19,10 @@
                <MenuItem fx:id="menuExportPdf" mnemonicParsing="false" text="To PDF file"/>
            </Menu>
            <Menu mnemonicParsing="false" text="Generate">
-               <items>
-                   <MenuItem mnemonicParsing="false"/>
-               </items>
+               <MenuItem mnemonicParsing="false"/>
            </Menu>
            <Menu mnemonicParsing="false" text="Compute">
-               <items>
-                   <MenuItem mnemonicParsing="false" text="About"/>
-               </items>
+               <MenuItem mnemonicParsing="false" text="About"/>
            </Menu>
        </MenuBar>
    </top>
