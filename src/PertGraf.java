@@ -82,6 +82,51 @@ public class PertGraf extends Graf {
         return pert; // Pas fini
     }
 
+    Map<Node, Integer> computeEarliestTimesV2() {
+        List<Node> startingTasks = getStartingTasks();
+        Map<Node, Integer> distances = new HashMap<>();
+        Map<Node, Node> predecessors = new HashMap<>();
+
+        this.adjList.forEach((node, successors) -> {
+            distances.put(node, Integer.MIN_VALUE);
+            predecessors.put(node, null);
+        });
+
+        Node startingNode = addStartingTask(getStartingTasks());
+        distances.put(startingNode, 0);
+        predecessors.put(startingNode, startingNode);
+
+        addEndingTask(getEndingTasks());
+
+        System.out.println("DEBUG");
+
+        List<Edge> allEdges = getAllEdges();
+        int nodesCount = this.adjList.size();
+        int i = 0;
+        boolean modified = true;
+
+        while (i < nodesCount && modified) {
+            modified = false;
+            for (Edge edge : allEdges) {
+                System.out.println("    Edge: " + edge.getTail().getName() + "(" + edge.getWeight() + ")");
+                if (distances.get(edge.getTail()) < distances.get(edge.getHead()) + edge.getWeight()) {
+                    System.out.println("yep");
+                    modified = true;
+                    int newDistance = distances.get(edge.getHead());
+                    if (newDistance == Integer.MIN_VALUE) newDistance = 0;
+                    newDistance += edge.getWeight();
+                    distances.put(edge.getTail(), newDistance);
+                    predecessors.put(edge.getTail(), edge.getHead());
+                }
+            }
+            i++;
+        }
+
+        removeNode(startingNode);
+
+        return distances;
+    }
+
     Map<Node, Integer> computeEarliestTimes(boolean startingEndingNotAdded) { //TODO edit bellman-fords, we dont need iter count
         Map<Node, Integer> distances = new HashMap<>();
         Map<Node, Node> predecessors = new HashMap<>();
@@ -192,6 +237,7 @@ public class PertGraf extends Graf {
     void computeCriticalPathsRec(List<List<Node>> paths, List<Node> currentPath, Map<Node, Integer> earliestTimes, Map<Node, Integer> latestTimes, List<Node> currentNode) {
         boolean found = false;
         for (Node node : currentNode) {
+            System.out.println("[critical] Current: " + node.getName());
             if (earliestTimes.get(node).equals(latestTimes.get(node))) {
                 if (!found) {
                     currentPath.add(node);
@@ -211,7 +257,7 @@ public class PertGraf extends Graf {
         PertGraf reversed = getReversePert();
         reversed.addStartingTask(reversed.getStartingTasks());
         reversed.addEndingTask(reversed.getEndingTasks());
-        Map<Node, Integer> earliestTimesReverse = reversed.computeEarliestTimes(false);
+        Map<Node, Integer> earliestTimesReverse = /*reversed.*/computeEarliestTimesV2();
 
         System.out.println("Earliest...");
         for (Map.Entry<Node, Integer> entry : earliestTimesReverse.entrySet()) {

@@ -1,0 +1,8 @@
+# task name, label, duration, dependencies
+#--------------------------------------
+A, a, 1, -
+B, b, 2, A
+C, c, 4, B
+D, d, 0, C, F
+E, e, 1, A
+F, f, 1, E
