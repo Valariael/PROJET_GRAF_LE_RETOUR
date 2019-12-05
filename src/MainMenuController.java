@@ -90,7 +90,7 @@ public class MainMenuController implements Initializable {
         selectedDisplayType = d;
     }
 
-    private void displayGraf() {
+    void displayGraf() {
         switch (selectedDisplayType) {
             case PERT_FORMAT:
                 textAreaDisplayGraph.setText(PertGraf.getInstance().toPertString());
@@ -449,6 +449,26 @@ public class MainMenuController implements Initializable {
                 stage.setScene(scene);
                 stage.show();
                 controller.setObserver(stage);
+                controller.setOriginController(this);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        });
+
+        featureRemoveEdge.setOnAction(event -> {
+            final FXMLLoader fxmlLoader = new FXMLLoader();
+            FileInputStream fxmlStream;
+            try {
+                fxmlStream = new FileInputStream("resources/remove_edge_dialog.fxml");
+                BorderPane rootLayout = fxmlLoader.load(fxmlStream);
+                RemoveEdgeDialogController controller = fxmlLoader.getController();
+                Scene scene = new Scene(rootLayout);
+                Stage stage = new Stage();
+                stage.setTitle("Removing an edge");
+                stage.setScene(scene);
+                stage.show();
+                controller.setObserver(stage);
+                controller.setOriginController(this);
             } catch (IOException e) {
                 e.printStackTrace();
             }

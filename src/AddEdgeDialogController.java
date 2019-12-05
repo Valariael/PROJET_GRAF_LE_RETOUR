@@ -1,4 +1,3 @@
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
@@ -14,11 +13,11 @@ import java.net.URL;
 import java.util.List;
 import java.util.ResourceBundle;
 
-public class AddEdgeDialogController implements Initializable
-{
+public class AddEdgeDialogController implements Initializable {
     private Stage stage;
     private List<Node> nodes;
     private Task fromNode = null, toNode = null;
+    private MainMenuController mainController;
 
     @FXML
     private VBox addEdgeDialogFromBox, addEdgeDialogToBox;
@@ -73,6 +72,7 @@ public class AddEdgeDialogController implements Initializable
                 Task toTask = new Task(toNode.getName(), toNode.getLabel(), ((Task) toNode).getDuration(), ((Task) fromNode).getDuration());
                 toTask.setToWeightActivated(true);
                 PertGraf.getInstance().addEdge(fromNode, toTask);
+                mainController.displayGraf();
                 stage.close();
             }
         });
@@ -82,5 +82,9 @@ public class AddEdgeDialogController implements Initializable
 
     void setObserver(Stage u) {
         this.stage = u;
+    }
+
+    void setOriginController(MainMenuController u) {
+        this.mainController = u;
     }
 }
