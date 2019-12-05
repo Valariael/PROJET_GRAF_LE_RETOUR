@@ -1,8 +1,11 @@
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.geometry.Insets;
 import javafx.scene.control.*;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.GridPane;
 import javafx.stage.FileChooser;
+import javafx.util.Pair;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -316,6 +319,59 @@ public class MainMenuController implements Initializable {
         displayReverseGraph.setOnAction(event -> {
             PertGraf.setInstance(PertGraf.getInstance().getReversePert());
             displayGraf();
+        });
+
+        class NewNodeInfos {
+            String name;
+            String label;
+            int duration;
+            NewNodeInfos(String name, String label, int duration) {
+                this.name = name;
+                this.label = label;
+                this.duration = duration;
+            }
+        }
+
+        featureAddNode.setOnAction(event -> {
+            Dialog<NewNodeInfos> dialog = new Dialog<>();
+            dialog.setTitle("Add a Node");
+            dialog.setHeaderText("Please, fill the nodes informations");
+
+            ButtonType confirmButtonType = new ButtonType("Ok", ButtonBar.ButtonData.OK_DONE);
+            dialog.getDialogPane().getButtonTypes().addAll(confirmButtonType, ButtonType.CANCEL);
+
+            GridPane grid = new GridPane();
+            grid.setHgap(10);
+            grid.setVgap(10);
+            grid.setPadding(new Insets(20, 150, 10, 10));
+
+            TextField nodeName = new TextField();
+            nodeName.setPromptText("Task name");
+            TextField nodeLabel = new TextField();
+            nodeLabel.setPromptText("Task label");
+            Spinner nodeDuration = new Spinner();
+            nodeDuration.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(-9999, 9999, 0));
+
+            grid.add(new Label("Task name:"), 0, 0);
+            grid.add(nodeName, 1, 0);
+            grid.add(new Label("Task label:"), 0, 1);
+            grid.add(nodeLabel, 1, 1);
+            grid.add(new Label("Task duration:"), 0, 2);
+            grid.add(nodeDuration, 1, 2);
+
+            dialog.getDialogPane().setContent(grid);
+
+            dialog.setResultConverter(dialogButton -> {
+                if (dialogButton == confirmButtonType) {
+                    return new NewNodeInfos(nodeName.getText(), nodeLabel.getText(), (Integer) nodeDuration.getValue());
+                }
+                return null;
+            });
+
+            Optional<NewNodeInfos> result = dialog.showAndWait();
+            result.ifPresent(content -> {
+                PertGraf.getInstance().addNode(new Task(content.name, content.label, content.duration));
+            });
         });
     }
 
