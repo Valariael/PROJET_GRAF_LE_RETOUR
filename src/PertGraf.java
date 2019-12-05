@@ -172,52 +172,8 @@ public class PertGraf extends Graf {
         return new TaskRaw(name, label, weight, dependencies);
     }
 
-    Map<Node, Integer> computeEarliestTimesV2() {//TODO
-        List<Node> startingTasks = getStartingTasks();
-        Map<Node, Integer> distances = new HashMap<>();
-        Map<Node, Node> predecessors = new HashMap<>();
 
-        this.adjList.forEach((node, successors) -> {
-            distances.put(node, Integer.MIN_VALUE);
-            predecessors.put(node, null);
-        });
-
-        Node startingNode = addStartingTask(getStartingTasks());
-        distances.put(startingNode, 0);
-        predecessors.put(startingNode, startingNode);
-
-        addEndingTask(getEndingTasks());
-
-        System.out.println("DEBUG");
-
-        List<Edge> allEdges = getAllEdges();
-        int nodesCount = this.adjList.size();
-        int i = 0;
-        boolean modified = true;
-
-        while (i < nodesCount && modified) {
-            modified = false;
-            for (Edge edge : allEdges) {
-                System.out.println("    Edge: " + edge.getTail().getName() + "(" + edge.getWeight() + ")");
-                if (distances.get(edge.getTail()) < distances.get(edge.getHead()) + edge.getWeight()) {
-                    System.out.println("yep");
-                    modified = true;
-                    int newDistance = distances.get(edge.getHead());
-                    if (newDistance == Integer.MIN_VALUE) newDistance = 0;
-                    newDistance += edge.getWeight();
-                    distances.put(edge.getTail(), newDistance);
-                    predecessors.put(edge.getTail(), edge.getHead());
-                }
-            }
-            i++;
-        }
-
-        removeNode(startingNode);
-
-        return distances;
-    }
-
-    Map<Node, Integer> computeEarlyTimes() { //TODO edit bellman-fords, we dont need iter count
+    Map<Node, Integer> computeEarlyTimes() {
         Map<Node, Integer> distances = new HashMap<>();
         Task startingNode = new Task(PERT_START_NODE);
 
@@ -334,8 +290,6 @@ public class PertGraf extends Graf {
         List<List<Node>> criticalsPaths = new ArrayList<>();
         ArrayList<Node> startingTasks = getStartingTasks();
 
-        startingTasks.remove(new Task(PERT_END_NODE));  // Why ending is here?
-
         List<Node> path = new ArrayList<>();
         criticalsPaths.add(path);
         computeCriticalPathsRec(criticalsPaths, path, earliestTimes, latestTimes, startingTasks);
@@ -381,6 +335,8 @@ public class PertGraf extends Graf {
         for (Map.Entry<Node, ArrayList<Node>> entry : this.adjList.entrySet()) {
             entry.getValue().remove(end);
         }
+
+        this.adjList.remove(end);
     }
 
     private ArrayList<Node> getStartingTasks() {
@@ -546,15 +502,7 @@ public class PertGraf extends Graf {
         List<Edge> edges = new ArrayList<>();
         for (Map.Entry<Node, ArrayList<Node>> nodeEntry : adjList.entrySet()) {
             for (Node node : nodeEntry.getValue()) {
-                /*if(node.getToLabel() == ((Task) node).getDuration() || node.getName().equals(PERT_END_NODE)) {
-                    edges.add(new PertEdge(nodeEntry.getKey(), node, ((Task) node).getDuration()));
-                } else if (node.getToLabel() != ((Task) node).getDuration() && node.getName().equals(PERT_START_NODE)) {
-                    edges.add(new PertEdge(nodeEntry.getKey(), node, nodeEntry.getKey().getToLabel()));
-                } else if (node.getToLabel() == ((Task) nodeEntry.getKey()).getDuration() && nodeEntry.getKey().getName().equals(PERT_START_NODE)) {
-                    edges.add(new PertEdge(nodeEntry.getKey(), node, nodeEntry.getKey().getToLabel()));
-                } else {*/
-                    edges.add(new PertEdge(nodeEntry.getKey(), node, node.getToLabel()));
-                /*}*/
+                edges.add(new PertEdge(nodeEntry.getKey(), node, node.getToLabel()));
             }
         }
 
@@ -674,13 +622,13 @@ public class PertGraf extends Graf {
         StringBuilder sb = new StringBuilder();
         for (Node node : getAllNodes()) {
             Task task = (Task) node;
-            String buildLine = task.getName() + ", " + task.getLabel() + ", " + task.getDuration();
+            StringBuilder buildLine = new StringBuilder(task.getName() + ", " + task.getLabel() + ", " + task.getDuration());
             List<Edge> inEdges = getInEdges(node);
             if (inEdges.isEmpty()) {
-                buildLine += ", -";
+                buildLine.append(", -");
             }
             for (Edge edge : inEdges) {
-                buildLine += ", " + edge.getHead().getName();
+                buildLine.append(", ").append(edge.getHead().getName());
             }
             sb.append(buildLine);
             sb.append(System.getProperty("line.separator"));
