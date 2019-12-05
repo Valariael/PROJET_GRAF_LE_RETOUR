@@ -137,6 +137,7 @@ public class PertGraf extends Graf {
                     p.addNode(to);
                 }
 
+                to.setToWeightActivated(true);
                 p.addEdge(from, to);
             }
         }
@@ -171,7 +172,7 @@ public class PertGraf extends Graf {
         return new TaskRaw(name, label, weight, dependencies);
     }
 
-    Map<Node, Integer> computeEarliestTimesV2() {
+    Map<Node, Integer> computeEarliestTimesV2() {//TODO
         List<Node> startingTasks = getStartingTasks();
         Map<Node, Integer> distances = new HashMap<>();
         Map<Node, Node> predecessors = new HashMap<>();
@@ -216,89 +217,51 @@ public class PertGraf extends Graf {
         return distances;
     }
 
-    Map<Node, Integer> computeEarliestTimes(boolean startingEndingNotAdded) { //TODO edit bellman-fords, we dont need iter count
+    Map<Node, Integer> computeEarlyTimes() { //TODO edit bellman-fords, we dont need iter count
         Map<Node, Integer> distances = new HashMap<>();
-        Map<Node, Node> predecessors = new HashMap<>();
-        int numberOfNodes = this.adjList.keySet().size();
         Task startingNode = new Task(PERT_START_NODE);
-        if(startingEndingNotAdded) {
-            startingNode = addStartingTask(getStartingTasks()); //TODO keep starting node in pert ?
-            addEndingTask(getEndingTasks());
-        }
-        List<Edge> allEdges = this.getAllEdges();
 
         // init Bellman-Ford
-        this.adjList.forEach((node, successors) -> {
-            distances.put(node, Integer.MAX_VALUE);
-            predecessors.put(node, null);
-        });
+        this.adjList.forEach((node, successors) -> distances.put(node, Integer.MIN_VALUE));
         distances.put(startingNode, 0);
-        predecessors.put(startingNode, startingNode);
-        int iter = 1;
-        boolean modified = true;
 
-        // processing shortest paths
-        while (iter < numberOfNodes && modified) {
+        boolean modified = true;
+        while(modified) {
             modified = false;
 
-            for (Edge e : allEdges) {
-                if (distances.get(e.getTail()) > distances.get(e.getHead()) + e.getWeight()) {
-                    if(distances.get(e.getHead()) != Integer.MAX_VALUE || e.getHead().getName().equals(PERT_END_NODE)) distances.put(e.getTail(), distances.get(e.getHead()) + e.getWeight());
-                    predecessors.put(e.getTail(), e.getHead());
-                    modified = true;
+            for(Node nodeFrom : this.adjList.keySet()) {
+                for(Node nodeTo : this.adjList.get(nodeFrom)) {
+                    if(distances.get(nodeTo) < distances.get(nodeFrom) + nodeTo.getToLabel()){
+                        distances.put(nodeTo, distances.get(nodeFrom) + nodeTo.getToLabel());
+                        modified = true;
+                    }
                 }
             }
-
-            iter++;
-        }
-
-        if(startingEndingNotAdded) {
-            removeNode(startingNode);
-            removeEndingTask();
         }
 
         return distances;
     }
 
-    Map<Node, Integer> computeLatestTimes(boolean startingEndingNotAdded) {
+    Map<Node, Integer> computeLateTimesFromEnd(int endingTime) {
         Map<Node, Integer> distances = new HashMap<>();
-        Map<Node, Node> predecessors = new HashMap<>();
-        int numberOfNodes = this.adjList.keySet().size();
-        Task startingNode = new Task(PERT_START_NODE);
-        if(startingEndingNotAdded) {
-            startingNode = addStartingTask(getStartingTasks()); //TODO keep starting node in pert ?
-            addEndingTask(getEndingTasks());
-        }
-        List<Edge> allEdges = this.getAllEdges();
+        Task startingNode = new Task(PERT_END_NODE);
 
         // init Bellman-Ford
-        this.adjList.forEach((node, successors) -> {
-            distances.put(node, Integer.MIN_VALUE);
-            predecessors.put(node, null);
-        });
+        this.adjList.forEach((node, successors) -> distances.put(node, endingTime));
+        distances.put(startingNode, endingTime);
 
-        distances.put(startingNode, 0);
-        predecessors.put(startingNode, startingNode);
-        int iter = 1;
         boolean modified = true;
-
-        // processing longest paths
-        while (iter < numberOfNodes && modified) {
+        while(modified) {
             modified = false;
 
-            for (Edge e : allEdges) {
-                if (distances.get(e.getTail()) < distances.get(e.getHead()) + e.getWeight()) {
-                    if(distances.get(e.getHead()) != Integer.MIN_VALUE || e.getTail().getName().equals(PERT_START_NODE)) distances.put(e.getTail(), distances.get(e.getHead()) + e.getWeight());
-                    modified = true;
+            for(Node nodeFrom : this.adjList.keySet()) {
+                for(Node nodeTo : this.adjList.get(nodeFrom)) {
+                    if(distances.get(nodeTo) > distances.get(nodeFrom) - nodeTo.getToLabel()){
+                        distances.put(nodeTo, distances.get(nodeFrom) - nodeTo.getToLabel());
+                        modified = true;
+                    }
                 }
             }
-
-            iter++;
-        }
-
-        if(startingEndingNotAdded) {
-            removeNode(startingNode);
-            removeEndingTask();
         }
 
         return distances;
@@ -315,7 +278,7 @@ public class PertGraf extends Graf {
 
         // recreating all edges but with head and tail inverted
         this.adjList.forEach((nodeFrom, nodeList) -> nodeList.forEach((nodeTo) -> {
-            Task newNodeTo = new Task(nodeFrom.getName(), ((Task) nodeFrom).getLabel(), ((Task) nodeFrom).getDuration(), nodeTo.getToLabel());
+            Task newNodeTo = new Task(nodeFrom.getName(), ((Task) nodeFrom).getLabel(), ((Task) nodeFrom).getDuration(), ((Task) nodeFrom).getDuration());
             newNodeTo.setToWeightActivated(true);
             reverse.addEdge(new Task(nodeTo.getName()), newNodeTo);
         }));
@@ -342,35 +305,37 @@ public class PertGraf extends Graf {
         }
     }
 
-    List<List<Node>> computeCriticalPaths() { //TODO keep starting node in pert ?
-        PertGraf reversed = getReversePert();
-        reversed.addStartingTask(reversed.getStartingTasks());
-        reversed.addEndingTask(reversed.getEndingTasks());
-        Map<Node, Integer> earliestTimesReverse = /*reversed.*/computeEarliestTimesV2();
+    List<List<Node>> computeCriticalPaths() {
+        Task startingNode = addStartingTask(getStartingTasks()); //TODO keep starting node in pert ?
+        Task endingNode = addEndingTask(getEndingTasks());
 
+        Map<Node, Integer> earliestTimes = computeEarlyTimes();
         System.out.println("Earliest...");
-        for (Map.Entry<Node, Integer> entry : earliestTimesReverse.entrySet()) {
+        for (Map.Entry<Node, Integer> entry : earliestTimes.entrySet()) {
             System.out.println(entry.getKey().getName() + " : " + entry.getValue());
         }
-        Task startingNode = addStartingTask(getStartingTasks());
-        Task endingNode = addEndingTask(getEndingTasks());
-        Map<Node, Integer> latestTimes = computeLatestTimes(false);
-        removeNode(startingNode);
-        removeEndingTask();
-        for(Map.Entry<Node, Integer> entry : latestTimes.entrySet()) {
-            entry.setValue(entry.getValue() - endingNode.getToLabel());
-        }//TODO: ATTENTION GRUGAGE EN PUISSANCE
+
+        PertGraf reversed = getReversePert();
+        Map<Node, Integer> latestTimes = reversed.computeLateTimesFromEnd(earliestTimes.get(endingNode));
         System.out.println("Latest...");
         for (Map.Entry<Node, Integer> entry : latestTimes.entrySet()) {
             System.out.println(entry.getKey().getName() + " : " + entry.getValue());
         }
 
+        removeNode(startingNode);
+        removeEndingTask();
+
+        System.out.println("Critical nodes : ");
+        for(Map.Entry<Node, Integer> entry : earliestTimes.entrySet()) {
+            if(latestTimes.get(entry.getKey()).equals(entry.getValue())) System.out.println(entry.getKey().toString());
+        }
+
         List<List<Node>> criticalsPaths = new ArrayList<>();
-        ArrayList<Node> startingTasks = getStartingTasks();
+        /*ArrayList<Node> startingTasks = getStartingTasks();
 
         List<Node> path = new ArrayList<>();
         criticalsPaths.add(path);
-        computeCriticalPathsRec(criticalsPaths, path, earliestTimesReverse, latestTimes, startingTasks);
+        computeCriticalPathsRec(criticalsPaths, path, earliestTimes, latestTimes, startingTasks);*/
 
         return criticalsPaths;
     }
@@ -578,15 +543,15 @@ public class PertGraf extends Graf {
         List<Edge> edges = new ArrayList<>();
         for (Map.Entry<Node, ArrayList<Node>> nodeEntry : adjList.entrySet()) {
             for (Node node : nodeEntry.getValue()) {
-                if(node.getToLabel() == ((Task) node).getDuration() || node.getName().equals(PERT_END_NODE)) {
+                /*if(node.getToLabel() == ((Task) node).getDuration() || node.getName().equals(PERT_END_NODE)) {
                     edges.add(new PertEdge(nodeEntry.getKey(), node, ((Task) node).getDuration()));
                 } else if (node.getToLabel() != ((Task) node).getDuration() && node.getName().equals(PERT_START_NODE)) {
                     edges.add(new PertEdge(nodeEntry.getKey(), node, nodeEntry.getKey().getToLabel()));
                 } else if (node.getToLabel() == ((Task) nodeEntry.getKey()).getDuration() && nodeEntry.getKey().getName().equals(PERT_START_NODE)) {
                     edges.add(new PertEdge(nodeEntry.getKey(), node, nodeEntry.getKey().getToLabel()));
-                } else {
-                    edges.add(new PertEdge(nodeEntry.getKey(), node, ((Task) nodeEntry.getKey()).getDuration()));
-                }
+                } else {*/
+                    edges.add(new PertEdge(nodeEntry.getKey(), node, node.getToLabel()));
+                /*}*/
             }
         }
 

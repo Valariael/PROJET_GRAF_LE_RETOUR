@@ -5,17 +5,20 @@ public class Task extends Node {
 
     Task(String name) {
         super(name);
+        this.setToLabel(0);
     }
 
     Task(String name, String label) {
         super(name);
         this.label = label;
+        this.setToLabel(0);
     }
 
     Task(String name, String label, int duration) {
         super(name);
         this.label = label;
         this.duration = duration;
+        this.setToLabel(0);
     }
 
     Task(String name, String label, int duration, int toLabel) {
