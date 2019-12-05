@@ -90,13 +90,13 @@ public class MainMenuController implements Initializable {
     private void displayGraf() {
         switch (selectedDisplayType) {
             case PERT_FORMAT:
-                //TODO
+                textAreaDisplayGraph.setText(PertGraf.getInstance().toPertString());
                 break;
             case DOT_FORMAT:
                 textAreaDisplayGraph.setText(PertGraf.getInstance().toDotString());
                 break;
             case ADJACENCY_LIST:
-                //TODO
+                textAreaDisplayGraph.setText(PertGraf.getInstance().toString());
                 break;
             case ADJACENCY_MATRIX:
                 StringBuilder sb = new StringBuilder();

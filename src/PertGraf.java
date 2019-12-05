@@ -654,10 +654,23 @@ public class PertGraf extends Graf {
 
     @Override
     public String toString() {
-        return super.toString();
+        StringBuilder sb = new StringBuilder();
+        for(Map.Entry<Node, ArrayList<Node>> entry : adjList.entrySet()) {
+            boolean first = true;
+            sb.append(entry.getKey().getName()).append(" -> ");
+            for (Node nextTask : entry.getValue()) {
+                if (!first) {
+                    sb.append(", ");
+                }
+                sb.append(nextTask.getName());
+                first = false;
+            }
+            sb.append(System.getProperty("line.separator"));
+        }
+        return sb.toString();
     }
 
-    public String printFormat() {
+    public String toPertString() {
         StringBuilder sb = new StringBuilder();
         for (Node node : getAllNodes()) {
             Task task = (Task) node;

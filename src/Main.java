@@ -12,7 +12,7 @@ public class Main {
                 list.forEach((elt) -> System.out.print(elt.getName() + " -> "));
                 System.out.println("-");
             });
-            System.out.println(p.printFormat());
+            System.out.println(p.toPertString());
             ////////////////
         } catch (IOException | InvalidFormatException e) {
             e.printStackTrace();
