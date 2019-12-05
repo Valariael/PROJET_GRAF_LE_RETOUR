@@ -656,4 +656,22 @@ public class PertGraf extends Graf {
     public String toString() {
         return super.toString();
     }
+
+    public String printFormat() {
+        StringBuilder sb = new StringBuilder();
+        for (Node node : getAllNodes()) {
+            Task task = (Task) node;
+            String buildLine = task.getName() + ", " + task.getLabel() + ", " + task.getDuration();
+            List<Edge> inEdges = getInEdges(node);
+            if (inEdges.isEmpty()) {
+                buildLine += ", -";
+            }
+            for (Edge edge : inEdges) {
+                buildLine += ", " + edge.getHead().getName();
+            }
+            sb.append(buildLine);
+            sb.append(System.getProperty("line.separator"));
+        }
+        return sb.toString();
+    }
 }
