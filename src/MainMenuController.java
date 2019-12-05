@@ -8,10 +8,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URL;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
-import java.util.ResourceBundle;
+import java.util.*;
 
 public class MainMenuController implements Initializable {
     private UserInterface userInterface;
@@ -236,15 +233,74 @@ public class MainMenuController implements Initializable {
         });
 
         menuLongestPath.setOnAction(event -> {
-            //TODO
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            alert.setTitle("Computed result");
+            alert.setHeaderText("Longest path result : ");
+            StringBuilder sb = new StringBuilder();
+
+            PertGraf p = PertGraf.getInstance();
+
+            Task startingNode = p.addStartingTask(p.getStartingTasks());
+            p.addEndingTask(p.getEndingTasks());
+            LongestPathInfo<Deque<Node>, Integer> info = p.computeLongestPathFrom(startingNode);
+
+            sb.append("Distance : ");
+            sb.append(info.dist);
+            sb.append("\n");
+            for(Node n : info.list) {
+                sb.append(n.toString());
+                sb.append("\n");
+            }
+            alert.setContentText(sb.toString());
+
+            p.removeNode(startingNode);
+            p.removeEndingTask();
+
+            alert.showAndWait();
         });
 
         menuEarlyTimes.setOnAction(event -> {
-            //TODO
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            alert.setTitle("Computed result");
+            alert.setHeaderText("Early times result : ");
+            StringBuilder sb = new StringBuilder();
+            Map<Node, Integer> times = PertGraf.getInstance().computeEarlyTimes();
+
+            for(Map.Entry<Node, Integer> entry : times.entrySet()) {
+                sb.append(entry.getKey().toString());
+                sb.append(" : ");
+                sb.append(entry.getValue().toString());
+                sb.append("\n");
+            }
+            alert.setContentText(sb.toString());
+
+            alert.showAndWait();
         });
 
         menuLateTimes.setOnAction(event -> {
-            //TODO
+            TextInputDialog dialog = new TextInputDialog("10");
+            dialog.setTitle("Preparation");
+            dialog.setHeaderText("Ending earliest time");
+            dialog.setContentText("Enter an ending time from the early times ");
+
+            Optional<String> result = dialog.showAndWait();
+            result.ifPresent(s -> {
+                Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                alert.setTitle("Computed result");
+                alert.setHeaderText("Late times from end result : ");
+                StringBuilder sb = new StringBuilder();
+                Map<Node, Integer> times = PertGraf.getInstance().computeLateTimesFromEnd(Integer.parseInt(s));
+
+                for(Map.Entry<Node, Integer> entry : times.entrySet()) {
+                    sb.append(entry.getKey().toString());
+                    sb.append(" : ");
+                    sb.append(entry.getValue().toString());
+                    sb.append("\n");
+                }
+                alert.setContentText(sb.toString());
+
+                alert.showAndWait();
+            });
         });
 
         menuCriticalpath.setOnAction(event -> {

@@ -297,7 +297,7 @@ public class PertGraf extends Graf {
         return criticalsPaths;
     }
 
-    private Task addStartingTask(ArrayList<Node> children) {
+    Task addStartingTask(ArrayList<Node> children) {
         Task start = new Task(PERT_START_NODE);
         start.setDuration(0);
 
@@ -312,7 +312,7 @@ public class PertGraf extends Graf {
         return start;
     }
 
-    private Task addEndingTask(ArrayList<Task> parents) {
+    Task addEndingTask(ArrayList<Task> parents) {
         Task end = new Task(PERT_END_NODE);
 
         this.addNode(end);
@@ -329,7 +329,7 @@ public class PertGraf extends Graf {
         return end;
     }
 
-    private void removeEndingTask() {
+    void removeEndingTask() {
         Task end = new Task(PERT_END_NODE);
 
         for (Map.Entry<Node, ArrayList<Node>> entry : this.adjList.entrySet()) {
@@ -339,7 +339,7 @@ public class PertGraf extends Graf {
         this.adjList.remove(end);
     }
 
-    private ArrayList<Node> getStartingTasks() {
+    ArrayList<Node> getStartingTasks() {
         ArrayList<Node> startingTasks = new ArrayList<>();
         HashSet<Node> known = new HashSet<>();
 
@@ -354,7 +354,7 @@ public class PertGraf extends Graf {
         return startingTasks;
     }
 
-    private ArrayList<Task> getEndingTasks() {
+    ArrayList<Task> getEndingTasks() {
         ArrayList<Task> endingTasks = new ArrayList<>();
 
         for (Map.Entry<Node, ArrayList<Node>> entry : this.adjList.entrySet()) {
@@ -438,7 +438,7 @@ public class PertGraf extends Graf {
         return null;
     }
 
-    private LongestPathInfo<Deque<Node>, Integer> computeLongestPathFrom(Node startingNode) { //TODO support multiple longest paths
+    LongestPathInfo<Deque<Node>, Integer> computeLongestPathFrom(Node startingNode) { //TODO support multiple longest paths
         List<Edge> allEdges = this.getAllEdges();
         Map<Node, Integer> distances = new HashMap<>();
         Map<Node, Node> predecessors = new HashMap<>();
