@@ -1,10 +1,14 @@
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.FileChooser;
+import javafx.stage.Stage;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URL;
@@ -372,6 +376,24 @@ public class MainMenuController implements Initializable {
         displayReverseGraph.setOnAction(event -> {
             PertGraf.setInstance(PertGraf.getInstance().getReversePert());
             displayGraf();
+        });
+
+        featureAddEdge.setOnAction(event -> {
+            final FXMLLoader fxmlLoader = new FXMLLoader();
+            FileInputStream fxmlStream;
+            try {
+                fxmlStream = new FileInputStream("resources/add_edge_dialog.fxml");
+                BorderPane rootLayout = fxmlLoader.load(fxmlStream);
+                AddEdgeDialogController controller = fxmlLoader.getController();
+                Scene scene = new Scene(rootLayout);
+                Stage stage = new Stage();
+                stage.setTitle("Adding an edge");
+                stage.setScene(scene);
+                stage.show();
+                controller.setObserver(stage);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         });
     }
 
