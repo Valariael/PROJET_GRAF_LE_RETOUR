@@ -45,7 +45,18 @@ public class MainMenuController implements Initializable {
             menuNewWithRange,
             menuNewEmpty,
             menuExportDot,
-            menuExportPdf;
+            menuExportPdf,
+            menuExportPert,
+            menuRandomDirectedGraph,
+            menuRandomDAG,
+            menuBFS,
+            menuDFS,
+            menuTransitiveClosure,
+            menuLongestPath,
+            menuEarlyTimes,
+            menuLateTimes,
+            menuCriticalpath,
+            menuListScheduling;
     @FXML
     BorderPane root;
 
@@ -159,6 +170,54 @@ public class MainMenuController implements Initializable {
                     alert.showAndWait();
                 }
             }
+        });
+
+        menuExportPdf.setOnAction(event -> {
+            //TODO
+        });
+
+        menuExportPert.setOnAction(event -> {
+            //TODO
+        });
+
+        menuRandomDirectedGraph.setOnAction(event -> {
+            //TODO
+        });
+
+        menuRandomDAG.setOnAction(event -> {
+            //TODO
+        });
+
+        menuBFS.setOnAction(event -> {
+            //TODO
+        });
+
+        menuDFS.setOnAction(event -> {
+            //TODO
+        });
+
+        menuTransitiveClosure.setOnAction(event -> {
+            //TODO
+        });
+
+        menuLongestPath.setOnAction(event -> {
+            //TODO
+        });
+
+        menuEarlyTimes.setOnAction(event -> {
+            //TODO
+        });
+
+        menuLateTimes.setOnAction(event -> {
+            //TODO
+        });
+
+        menuCriticalpath.setOnAction(event -> {
+            //TODO
+        });
+
+        menuListScheduling.setOnAction(event -> {
+            //TODO
         });
     }
 
