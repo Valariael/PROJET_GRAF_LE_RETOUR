@@ -5,24 +5,33 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
 
-<BorderPane fx:controller="MainMenuController" fx:id="root" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/10.0.2-internal" xmlns:fx="http://javafx.com/fxml/1">
+<BorderPane fx:id="root" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/10.0.2-internal" xmlns:fx="http://javafx.com/fxml/1" fx:controller="MainMenuController">
    <top>
        <MenuBar BorderPane.alignment="CENTER">
            <Menu mnemonicParsing="false" text="New graph">
-               <MenuItem fx:id="menuNewFromDot" mnemonicParsing="false" text="From DOT file"/>
-               <MenuItem fx:id="menuNewFromPert" mnemonicParsing="false" text="From PERT file"/>
-               <MenuItem fx:id="menuNewWithRange" mnemonicParsing="false" text="With range of nodes"/>
-               <MenuItem fx:id="menuNewEmpty" mnemonicParsing="false" text="Empty"/>
+               <MenuItem fx:id="menuNewFromDot" mnemonicParsing="false" text="From DOT file" />
+               <MenuItem fx:id="menuNewFromPert" mnemonicParsing="false" text="From PERT file" />
+               <MenuItem fx:id="menuNewWithRange" mnemonicParsing="false" text="With range of nodes" />
+               <MenuItem fx:id="menuNewEmpty" mnemonicParsing="false" text="Empty" />
            </Menu>
            <Menu mnemonicParsing="false" text="Export">
-               <MenuItem fx:id="menuExportDot" mnemonicParsing="false" text="To DOT file"/>
-               <MenuItem fx:id="menuExportPdf" mnemonicParsing="false" text="To PDF file"/>
+               <MenuItem fx:id="menuExportDot" mnemonicParsing="false" text="To DOT file" />
+               <MenuItem fx:id="menuExportPert" mnemonicParsing="false" text="To PERT file" />
+               <MenuItem fx:id="menuExportPdf" mnemonicParsing="false" text="To PDF file" />
            </Menu>
            <Menu mnemonicParsing="false" text="Generate">
-               <MenuItem mnemonicParsing="false"/>
+               <MenuItem fx:id="menuRandomDirectedGraph" mnemonicParsing="false" text="Random directed graph" />
+            <MenuItem fx:id="menuRandomDAG" mnemonicParsing="false" text="Random DAG" />
            </Menu>
            <Menu mnemonicParsing="false" text="Compute">
-               <MenuItem mnemonicParsing="false" text="About"/>
+               <MenuItem fx:id="menuBFS" mnemonicParsing="false" text="Breadth-FIrst-Search" />
+               <MenuItem fx:id="menuDFS" mnemonicParsing="false" text="Depth-FIrst-Search" />
+               <MenuItem fx:id="menuTransitiveClosure" mnemonicParsing="false" text="Transitive closure" />
+               <MenuItem fx:id="menuLongestPath" mnemonicParsing="false" text="Longest path" />
+               <MenuItem fx:id="menuEarlyTimes" mnemonicParsing="false" text="Early Times" />
+               <MenuItem fx:id="menuLateTimes" mnemonicParsing="false" text="Late times" />
+               <MenuItem fx:id="menuCriticalpath" mnemonicParsing="false" text="Critical path" />
+               <MenuItem fx:id="menuListScheduling" mnemonicParsing="false" text="List scheduling" />
            </Menu>
        </MenuBar>
    </top>
@@ -32,13 +41,11 @@
                <VBox prefHeight="373.0" prefWidth="200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                    <AnchorPane prefHeight="20.0" prefWidth="200.0">
                        <VBox.margin>
-                           <Insets bottom="5.0" left="10.0" right="10.0" top="5.0"/>
+                           <Insets bottom="5.0" left="10.0" right="10.0" top="5.0" />
                        </VBox.margin>
-                       <Button fx:id="displayPertFormat" mnemonicParsing="false" prefHeight="25.0" prefWidth="180.0"
-                               text="PERT format" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0"
-                               AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                       <Button fx:id="displayPertFormat" mnemonicParsing="false" prefHeight="25.0" prefWidth="180.0" text="PERT format" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                            <font>
-                               <Font name="Consolas Bold" size="13.0"/>
+                               <Font name="Consolas Bold" size="13.0" />
                            </font>
                        </Button>
                    </AnchorPane>
@@ -127,8 +134,7 @@
                </VBox>
            </AnchorPane>
            <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0">
-               <TextArea fx:id="textAreaDisplayGraph" prefHeight="373.0" prefWidth="392.0" AnchorPane.bottomAnchor="0.0"
-                         AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0"/>
+               <TextArea fx:id="textAreaDisplayGraph" prefHeight="373.0" prefWidth="392.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
            </AnchorPane>
        </SplitPane>
    </center>

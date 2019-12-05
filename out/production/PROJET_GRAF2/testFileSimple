@@ -1,12 +1,8 @@
 # task name, label, duration, dependencies
 #--------------------------------------
-A, a, 7, -
-B, b, 3, A
-C, c, 1, B
-D, d, 8, A
-E, e, 2, D, C
-F, f, 1, D, C
-G, g, 1, D, C
-H, h, 3, F
-I, i, 2, H
-J, j, 1, E, G, I
+A, a, 1, -
+B, b, 2, A
+C, c, 4, B
+D, d, 0, C, F
+E, e, 1, A
+F, f, 1, E
