@@ -68,7 +68,8 @@ public class MainMenuController implements Initializable {
     @FXML
     ResourceBundle resources;
 
-    public MainMenuController() {}
+    public MainMenuController() {
+    }
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -104,12 +105,12 @@ public class MainMenuController implements Initializable {
                 StringBuilder sb = new StringBuilder();
                 int[][] m = PertGraf.getInstance().getAdjMatrix();
 
-                for(int i = 0; i < m.length; i++) {
-                    for(int j = 0; j < m[i].length; j++) {
+                for (int i = 0; i < m.length; i++) {
+                    for (int j = 0; j < m[i].length; j++) {
                         sb.append(m[i][j]);
-                        if(j < m[i].length - 1) sb.append(", ");
+                        if (j < m[i].length - 1) sb.append(", ");
                     }
-                    if(i < m.length - 1) sb.append("\n");
+                    if (i < m.length - 1) sb.append("\n");
                 }
 
                 textAreaDisplayGraph.setText(sb.toString());
@@ -195,7 +196,7 @@ public class MainMenuController implements Initializable {
             alert.setTitle("Computed result");
             alert.setHeaderText("Breadth-First-Search result : ");
             StringBuilder sb = new StringBuilder();
-            for(Node n : PertGraf.getInstance().getBFS()) {
+            for (Node n : PertGraf.getInstance().getBFS()) {
                 sb.append(n.toString());
                 sb.append("\n");
             }
@@ -209,7 +210,7 @@ public class MainMenuController implements Initializable {
             alert.setTitle("Computed result");
             alert.setHeaderText("Depth-First-Search result : ");
             StringBuilder sb = new StringBuilder();
-            for(Node n : PertGraf.getInstance().getDFS()) {
+            for (Node n : PertGraf.getInstance().getDFS()) {
                 sb.append(n.toString());
                 sb.append("\n");
             }
@@ -231,7 +232,7 @@ public class MainMenuController implements Initializable {
             alert.getButtonTypes().setAll(buttonSave, buttonPNG, buttonCancel);
 
             Optional<ButtonType> result = alert.showAndWait();
-            if (result.get() == buttonSave){
+            if (result.get() == buttonSave) {
                 PertGraf.setInstance((PertGraf) PertGraf.getInstance().getTransitiveClosure());
             } else if (result.get() == buttonPNG) {
                 //TODO print as png
@@ -253,7 +254,7 @@ public class MainMenuController implements Initializable {
             sb.append("Distance : ");
             sb.append(info.dist);
             sb.append("\n");
-            for(Node n : info.list) {
+            for (Node n : info.list) {
                 sb.append(n.toString());
                 sb.append("\n");
             }
@@ -272,7 +273,7 @@ public class MainMenuController implements Initializable {
             StringBuilder sb = new StringBuilder();
             Map<Node, Integer> times = PertGraf.getInstance().computeEarlyTimes();
 
-            for(Map.Entry<Node, Integer> entry : times.entrySet()) {
+            for (Map.Entry<Node, Integer> entry : times.entrySet()) {
                 sb.append(entry.getKey().toString());
                 sb.append(" : ");
                 sb.append(entry.getValue().toString());
@@ -297,7 +298,7 @@ public class MainMenuController implements Initializable {
                 StringBuilder sb = new StringBuilder();
                 Map<Node, Integer> times = PertGraf.getInstance().computeLateTimesFromEnd(Integer.parseInt(s));
 
-                for(Map.Entry<Node, Integer> entry : times.entrySet()) {
+                for (Map.Entry<Node, Integer> entry : times.entrySet()) {
                     sb.append(entry.getKey().toString());
                     sb.append(" : ");
                     sb.append(entry.getValue().toString());
@@ -314,9 +315,9 @@ public class MainMenuController implements Initializable {
             alert.setTitle("Computed result");
             alert.setHeaderText("Critical path result : ");
             StringBuilder sb = new StringBuilder();
-            for(List<Node> l : PertGraf.getInstance().computeCriticalPaths()) {
+            for (List<Node> l : PertGraf.getInstance().computeCriticalPaths()) {
                 sb.append("Path : \n");
-                for(Node n : l) {
+                for (Node n : l) {
                     sb.append(n.toString());
                     sb.append("\n");
                 }
@@ -338,7 +339,7 @@ public class MainMenuController implements Initializable {
                 alert.setTitle("Computed result");
                 alert.setHeaderText("List scheduling result : ");
                 StringBuilder sb = new StringBuilder();
-                for(Node n : PertGraf.getInstance().computeListScheduling(Integer.parseInt(s))) {
+                for (Node n : PertGraf.getInstance().computeListScheduling(Integer.parseInt(s))) {
                     sb.append(n.toString());
                     sb.append("\n");
                 }
@@ -384,6 +385,7 @@ public class MainMenuController implements Initializable {
             String name;
             String label;
             int duration;
+
             NewNodeInfos(String name, String label, int duration) {
                 this.name = name;
                 this.label = label;
@@ -427,10 +429,13 @@ public class MainMenuController implements Initializable {
                 return null;
             });
 
+
             Optional<NewNodeInfos> result = dialog.showAndWait();
             result.ifPresent(content -> {
                 PertGraf.getInstance().addNode(new Task(content.name, content.label, content.duration));
             });
+        });
+
         featureAddEdge.setOnAction(event -> {
             final FXMLLoader fxmlLoader = new FXMLLoader();
             FileInputStream fxmlStream;
@@ -449,8 +454,7 @@ public class MainMenuController implements Initializable {
             }
         });
     }
-
-    void setObserver(UserInterface u) {
+    void setObserver(UserInterface u){
         this.userInterface = u;
     }
 }
