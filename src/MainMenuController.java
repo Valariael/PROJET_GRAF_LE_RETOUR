@@ -1,20 +1,20 @@
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.stage.FileChooser;
-import javafx.util.Pair;
+import javafx.stage.Stage;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URL;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
-import java.util.ResourceBundle;
+import java.util.*;
 
 public class MainMenuController implements Initializable {
     private UserInterface userInterface;
@@ -239,15 +239,74 @@ public class MainMenuController implements Initializable {
         });
 
         menuLongestPath.setOnAction(event -> {
-            //TODO
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            alert.setTitle("Computed result");
+            alert.setHeaderText("Longest path result : ");
+            StringBuilder sb = new StringBuilder();
+
+            PertGraf p = PertGraf.getInstance();
+
+            Task startingNode = p.addStartingTask(p.getStartingTasks());
+            p.addEndingTask(p.getEndingTasks());
+            LongestPathInfo<Deque<Node>, Integer> info = p.computeLongestPathFrom(startingNode);
+
+            sb.append("Distance : ");
+            sb.append(info.dist);
+            sb.append("\n");
+            for(Node n : info.list) {
+                sb.append(n.toString());
+                sb.append("\n");
+            }
+            alert.setContentText(sb.toString());
+
+            p.removeNode(startingNode);
+            p.removeEndingTask();
+
+            alert.showAndWait();
         });
 
         menuEarlyTimes.setOnAction(event -> {
-            //TODO
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            alert.setTitle("Computed result");
+            alert.setHeaderText("Early times result : ");
+            StringBuilder sb = new StringBuilder();
+            Map<Node, Integer> times = PertGraf.getInstance().computeEarlyTimes();
+
+            for(Map.Entry<Node, Integer> entry : times.entrySet()) {
+                sb.append(entry.getKey().toString());
+                sb.append(" : ");
+                sb.append(entry.getValue().toString());
+                sb.append("\n");
+            }
+            alert.setContentText(sb.toString());
+
+            alert.showAndWait();
         });
 
         menuLateTimes.setOnAction(event -> {
-            //TODO
+            TextInputDialog dialog = new TextInputDialog("10");
+            dialog.setTitle("Preparation");
+            dialog.setHeaderText("Ending earliest time");
+            dialog.setContentText("Enter an ending time from the early times ");
+
+            Optional<String> result = dialog.showAndWait();
+            result.ifPresent(s -> {
+                Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                alert.setTitle("Computed result");
+                alert.setHeaderText("Late times from end result : ");
+                StringBuilder sb = new StringBuilder();
+                Map<Node, Integer> times = PertGraf.getInstance().computeLateTimesFromEnd(Integer.parseInt(s));
+
+                for(Map.Entry<Node, Integer> entry : times.entrySet()) {
+                    sb.append(entry.getKey().toString());
+                    sb.append(" : ");
+                    sb.append(entry.getValue().toString());
+                    sb.append("\n");
+                }
+                alert.setContentText(sb.toString());
+
+                alert.showAndWait();
+            });
         });
 
         menuCriticalpath.setOnAction(event -> {
@@ -372,6 +431,22 @@ public class MainMenuController implements Initializable {
             result.ifPresent(content -> {
                 PertGraf.getInstance().addNode(new Task(content.name, content.label, content.duration));
             });
+        featureAddEdge.setOnAction(event -> {
+            final FXMLLoader fxmlLoader = new FXMLLoader();
+            FileInputStream fxmlStream;
+            try {
+                fxmlStream = new FileInputStream("resources/add_edge_dialog.fxml");
+                BorderPane rootLayout = fxmlLoader.load(fxmlStream);
+                AddEdgeDialogController controller = fxmlLoader.getController();
+                Scene scene = new Scene(rootLayout);
+                Stage stage = new Stage();
+                stage.setTitle("Adding an edge");
+                stage.setScene(scene);
+                stage.show();
+                controller.setObserver(stage);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         });
     }
 
