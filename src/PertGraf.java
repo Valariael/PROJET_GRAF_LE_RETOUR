@@ -172,52 +172,8 @@ public class PertGraf extends Graf {
         return new TaskRaw(name, label, weight, dependencies);
     }
 
-    Map<Node, Integer> computeEarliestTimesV2() {//TODO
-        List<Node> startingTasks = getStartingTasks();
-        Map<Node, Integer> distances = new HashMap<>();
-        Map<Node, Node> predecessors = new HashMap<>();
 
-        this.adjList.forEach((node, successors) -> {
-            distances.put(node, Integer.MIN_VALUE);
-            predecessors.put(node, null);
-        });
-
-        Node startingNode = addStartingTask(getStartingTasks());
-        distances.put(startingNode, 0);
-        predecessors.put(startingNode, startingNode);
-
-        addEndingTask(getEndingTasks());
-
-        System.out.println("DEBUG");
-
-        List<Edge> allEdges = getAllEdges();
-        int nodesCount = this.adjList.size();
-        int i = 0;
-        boolean modified = true;
-
-        while (i < nodesCount && modified) {
-            modified = false;
-            for (Edge edge : allEdges) {
-                System.out.println("    Edge: " + edge.getTail().getName() + "(" + edge.getWeight() + ")");
-                if (distances.get(edge.getTail()) < distances.get(edge.getHead()) + edge.getWeight()) {
-                    System.out.println("yep");
-                    modified = true;
-                    int newDistance = distances.get(edge.getHead());
-                    if (newDistance == Integer.MIN_VALUE) newDistance = 0;
-                    newDistance += edge.getWeight();
-                    distances.put(edge.getTail(), newDistance);
-                    predecessors.put(edge.getTail(), edge.getHead());
-                }
-            }
-            i++;
-        }
-
-        removeNode(startingNode);
-
-        return distances;
-    }
-
-    Map<Node, Integer> computeEarlyTimes() { //TODO edit bellman-fords, we dont need iter count
+    Map<Node, Integer> computeEarlyTimes() {
         Map<Node, Integer> distances = new HashMap<>();
         Task startingNode = new Task(PERT_START_NODE);
 

@@ -9,6 +9,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URL;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 import java.util.ResourceBundle;
 
@@ -247,11 +248,42 @@ public class MainMenuController implements Initializable {
         });
 
         menuCriticalpath.setOnAction(event -> {
-            //TODO
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            alert.setTitle("Computed result");
+            alert.setHeaderText("Critical path result : ");
+            StringBuilder sb = new StringBuilder();
+            for(List<Node> l : PertGraf.getInstance().computeCriticalPaths()) {
+                sb.append("Path : \n");
+                for(Node n : l) {
+                    sb.append(n.toString());
+                    sb.append("\n");
+                }
+            }
+            alert.setContentText(sb.toString());
+
+            alert.showAndWait();
         });
 
         menuListScheduling.setOnAction(event -> {
-            //TODO
+            TextInputDialog dialog = new TextInputDialog("1");
+            dialog.setTitle("Preparation");
+            dialog.setHeaderText("List scheduling");
+            dialog.setContentText("Enter a number of workers : ");
+
+            Optional<String> result = dialog.showAndWait();
+            result.ifPresent(s -> {
+                Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                alert.setTitle("Computed result");
+                alert.setHeaderText("List scheduling result : ");
+                StringBuilder sb = new StringBuilder();
+                for(Node n : PertGraf.getInstance().computeListScheduling(Integer.parseInt(s))) {
+                    sb.append(n.toString());
+                    sb.append("\n");
+                }
+                alert.setContentText(sb.toString());
+
+                alert.showAndWait();
+            });
         });
     }
 
