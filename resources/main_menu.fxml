@@ -19,7 +19,7 @@
             <Menu mnemonicParsing="false" text="Export">
                 <MenuItem fx:id="menuExportDot" mnemonicParsing="false" text="To DOT file"/>
                 <MenuItem fx:id="menuExportPert" mnemonicParsing="false" text="To PERT file"/>
-                <MenuItem fx:id="menuExportPdf" mnemonicParsing="false" text="To PDF file"/>
+                <MenuItem fx:id="menuExportPng" mnemonicParsing="false" text="To PDF file"/>
             </Menu>
             <Menu mnemonicParsing="false" text="Generate">
                 <MenuItem fx:id="menuRandomDirectedGraph" mnemonicParsing="false" text="Random directed graph"/>

@@ -1,9 +1,6 @@
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Button;
-import javafx.scene.control.MenuItem;
-import javafx.scene.control.TextArea;
+import javafx.scene.control.*;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.FileChooser;
 
@@ -12,6 +9,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URL;
 import java.util.Arrays;
+import java.util.Optional;
 import java.util.ResourceBundle;
 
 public class MainMenuController implements Initializable {
@@ -45,7 +43,7 @@ public class MainMenuController implements Initializable {
             menuNewWithRange,
             menuNewEmpty,
             menuExportDot,
-            menuExportPdf,
+            menuExportPng,
             menuExportPert,
             menuRandomDirectedGraph,
             menuRandomDAG,
@@ -172,7 +170,7 @@ public class MainMenuController implements Initializable {
             }
         });
 
-        menuExportPdf.setOnAction(event -> {
+        menuExportPng.setOnAction(event -> {
             //TODO
         });
 
@@ -189,15 +187,51 @@ public class MainMenuController implements Initializable {
         });
 
         menuBFS.setOnAction(event -> {
-            //TODO
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            alert.setTitle("Computed result");
+            alert.setHeaderText("Breadth-First-Search result : ");
+            StringBuilder sb = new StringBuilder();
+            for(Node n : PertGraf.getInstance().getBFS()) {
+                sb.append(n.toString());
+                sb.append("\n");
+            }
+            alert.setContentText(sb.toString());
+
+            alert.showAndWait();
         });
 
-        menuDFS.setOnAction(event -> {
-            //TODO
+        menuDFS.setOnAction(event -> {//TODO: pick starting node ?
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            alert.setTitle("Computed result");
+            alert.setHeaderText("Depth-First-Search result : ");
+            StringBuilder sb = new StringBuilder();
+            for(Node n : PertGraf.getInstance().getDFS()) {
+                sb.append(n.toString());
+                sb.append("\n");
+            }
+            alert.setContentText(sb.toString());
+
+            alert.showAndWait();
         });
 
         menuTransitiveClosure.setOnAction(event -> {
-            //TODO
+            Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+            alert.setTitle("Confirm changes");
+            alert.setHeaderText("You are about to compute the transitive closure of the graph.");
+            alert.setContentText("Do you want to save it as the current graph or print it as PNG ?\n(IT MIGHT BREAK EVERYTHING TO SAVE IT)");
+
+            ButtonType buttonSave = new ButtonType("Save");
+            ButtonType buttonPNG = new ButtonType("PNG");
+            ButtonType buttonCancel = new ButtonType("Cancel", ButtonBar.ButtonData.CANCEL_CLOSE);
+
+            alert.getButtonTypes().setAll(buttonSave, buttonPNG, buttonCancel);
+
+            Optional<ButtonType> result = alert.showAndWait();
+            if (result.get() == buttonSave){
+                PertGraf.setInstance((PertGraf) PertGraf.getInstance().getTransitiveClosure());
+            } else if (result.get() == buttonPNG) {
+                //TODO print as png
+            }
         });
 
         menuLongestPath.setOnAction(event -> {

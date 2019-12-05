@@ -334,8 +334,6 @@ public class PertGraf extends Graf {
         List<List<Node>> criticalsPaths = new ArrayList<>();
         ArrayList<Node> startingTasks = getStartingTasks();
 
-        startingTasks.remove(new Task(PERT_END_NODE));  // Why ending is here?
-
         List<Node> path = new ArrayList<>();
         criticalsPaths.add(path);
         computeCriticalPathsRec(criticalsPaths, path, earliestTimes, latestTimes, startingTasks);
@@ -381,6 +379,8 @@ public class PertGraf extends Graf {
         for (Map.Entry<Node, ArrayList<Node>> entry : this.adjList.entrySet()) {
             entry.getValue().remove(end);
         }
+
+        this.adjList.remove(end);
     }
 
     private ArrayList<Node> getStartingTasks() {
@@ -546,15 +546,7 @@ public class PertGraf extends Graf {
         List<Edge> edges = new ArrayList<>();
         for (Map.Entry<Node, ArrayList<Node>> nodeEntry : adjList.entrySet()) {
             for (Node node : nodeEntry.getValue()) {
-                /*if(node.getToLabel() == ((Task) node).getDuration() || node.getName().equals(PERT_END_NODE)) {
-                    edges.add(new PertEdge(nodeEntry.getKey(), node, ((Task) node).getDuration()));
-                } else if (node.getToLabel() != ((Task) node).getDuration() && node.getName().equals(PERT_START_NODE)) {
-                    edges.add(new PertEdge(nodeEntry.getKey(), node, nodeEntry.getKey().getToLabel()));
-                } else if (node.getToLabel() == ((Task) nodeEntry.getKey()).getDuration() && nodeEntry.getKey().getName().equals(PERT_START_NODE)) {
-                    edges.add(new PertEdge(nodeEntry.getKey(), node, nodeEntry.getKey().getToLabel()));
-                } else {*/
-                    edges.add(new PertEdge(nodeEntry.getKey(), node, node.getToLabel()));
-                /*}*/
+                edges.add(new PertEdge(nodeEntry.getKey(), node, node.getToLabel()));
             }
         }
 
@@ -657,17 +649,17 @@ public class PertGraf extends Graf {
         return super.toString();
     }
 
-    public String printFormat() {
+    String printFormat() {
         StringBuilder sb = new StringBuilder();
         for (Node node : getAllNodes()) {
             Task task = (Task) node;
-            String buildLine = task.getName() + ", " + task.getLabel() + ", " + task.getDuration();
+            StringBuilder buildLine = new StringBuilder(task.getName() + ", " + task.getLabel() + ", " + task.getDuration());
             List<Edge> inEdges = getInEdges(node);
             if (inEdges.isEmpty()) {
-                buildLine += ", -";
+                buildLine.append(", -");
             }
             for (Edge edge : inEdges) {
-                buildLine += ", " + edge.getHead().getName();
+                buildLine.append(", ").append(edge.getHead().getName());
             }
             sb.append(buildLine);
             sb.append(System.getProperty("line.separator"));
