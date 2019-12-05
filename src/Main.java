@@ -6,8 +6,14 @@ public class Main {
         try {
             ///// Test /////
             PertGraf p = PertGraf.createFromPertFile("./src/testFilePdfExample");
-            Objects.requireNonNull(p).computeCriticalPaths();
-            List<List<Node>> paths = p.computeCriticalPaths();
+            List<List<Node>> paths = Objects.requireNonNull(p).computeCriticalPaths();
+            paths.forEach((list) -> {
+                System.out.print("Path: ");
+                list.forEach((elt) -> {
+                    System.out.print(elt.getName() + " -> ");
+                });
+                System.out.println("-");
+            });
             ////////////////
         } catch (IOException | InvalidFormatException e) {
             e.printStackTrace();

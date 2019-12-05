@@ -291,6 +291,7 @@ public class PertGraf extends Graf {
         for (Node node : currentNode) {
             System.out.println("[critical] Current: " + node.getName());
             if (earliestTimes.get(node).equals(latestTimes.get(node))) {
+                System.out.println("Found");
                 if (!found) {
                     currentPath.add(node);
                     computeCriticalPathsRec(paths, currentPath, earliestTimes, latestTimes, adjList.get(node));
@@ -331,11 +332,13 @@ public class PertGraf extends Graf {
         }
 
         List<List<Node>> criticalsPaths = new ArrayList<>();
-        /*ArrayList<Node> startingTasks = getStartingTasks();
+        ArrayList<Node> startingTasks = getStartingTasks();
+
+        startingTasks.remove(new Task(PERT_END_NODE));  // Why ending is here?
 
         List<Node> path = new ArrayList<>();
         criticalsPaths.add(path);
-        computeCriticalPathsRec(criticalsPaths, path, earliestTimes, latestTimes, startingTasks);*/
+        computeCriticalPathsRec(criticalsPaths, path, earliestTimes, latestTimes, startingTasks);
 
         return criticalsPaths;
     }
