@@ -203,7 +203,22 @@ public class MainMenuController implements Initializable {
         });
 
         menuExportPert.setOnAction(event -> {
-            //TODO
+            FileChooser fileChooser = new FileChooser();
+            File file = chooseLocation(fileChooser, true);
+
+            if (file != null) {
+                try {
+                    PertGraf.getInstance().toPertFile(file.getPath());
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    Alert alert = new Alert(Alert.AlertType.ERROR);
+                    alert.setTitle("Error !");
+                    alert.setHeaderText(null);
+                    alert.setContentText("An error has occured, export aborted.");
+
+                    alert.showAndWait();
+                }
+            }
         });
 
         menuRandomDirectedGraph.setOnAction(event -> {

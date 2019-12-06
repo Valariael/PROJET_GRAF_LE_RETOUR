@@ -1,7 +1,4 @@
-import java.io.BufferedReader;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import java.util.*;
 
 public class PertGraf extends Graf {
@@ -634,5 +631,11 @@ public class PertGraf extends Graf {
             sb.append(System.getProperty("line.separator"));
         }
         return sb.toString();
+    }
+
+    public void toPertFile(String path) throws IOException {
+        BufferedWriter writer = new BufferedWriter(new FileWriter(path));
+        writer.write(this.toPertString());
+        writer.close();
     }
 }
