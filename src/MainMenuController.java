@@ -496,6 +496,25 @@ public class MainMenuController implements Initializable {
                 e.printStackTrace();
             }
         });
+
+        featureRemoveNode.setOnAction(event -> {
+            final FXMLLoader fxmlLoader = new FXMLLoader();
+            FileInputStream fxmlStream;
+            try {
+                fxmlStream = new FileInputStream("resources/remove_node_dialog.fxml");
+                BorderPane rootLayout = fxmlLoader.load(fxmlStream);
+                RemoveNodeDialogController controller = fxmlLoader.getController();
+                Scene scene = new Scene(rootLayout);
+                Stage stage = new Stage();
+                stage.setTitle("Removing a node");
+                stage.setScene(scene);
+                stage.show();
+                controller.setObserver(stage);
+                controller.setOriginController(this);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        });
     }
     void setObserver(UserInterface u){
         this.userInterface = u;
