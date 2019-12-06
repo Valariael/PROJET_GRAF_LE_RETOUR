@@ -18,6 +18,10 @@ public class PertGraf extends Graf {
         return pertInstance;
     }
 
+    static void resetInstance() {
+        pertInstance = new PertGraf();
+    }
+
     static void setInstance(PertGraf p) {
         pertInstance = p;
     }
@@ -239,7 +243,7 @@ public class PertGraf extends Graf {
         return reverse;
     }
 
-    void computeCriticalPathsRec(List<List<Node>> paths, List<Node> currentPath, Map<Node, Integer> earliestTimes, Map<Node, Integer> latestTimes, List<Node> currentNode) {
+    private void computeCriticalPathsRec(List<List<Node>> paths, List<Node> currentPath, Map<Node, Integer> earliestTimes, Map<Node, Integer> latestTimes, List<Node> currentNode) {
         boolean found = false;
         for (Node node : currentNode) {
             System.out.println("[critical] Current: " + node.getName());
@@ -615,7 +619,7 @@ public class PertGraf extends Graf {
         return sb.toString();
     }
 
-    public String toPertString() {
+    String toPertString() {
         StringBuilder sb = new StringBuilder();
         for (Node node : getAllNodes()) {
             Task task = (Task) node;
@@ -633,7 +637,7 @@ public class PertGraf extends Graf {
         return sb.toString();
     }
 
-    public void toPertFile(String path) throws IOException {
+    void toPertFile(String path) throws IOException {
         BufferedWriter writer = new BufferedWriter(new FileWriter(path));
         writer.write(this.toPertString());
         writer.close();

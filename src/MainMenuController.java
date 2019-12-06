@@ -18,7 +18,7 @@ import java.util.*;
 
 public class MainMenuController implements Initializable {
     private UserInterface userInterface;
-    private static DisplayType selectedDisplayType = DisplayType.DOT_FORMAT;
+    private static DisplayType selectedDisplayType = DisplayType.PERT_FORMAT;
     private File savedDirectory;
 
     private enum DisplayType {
@@ -146,6 +146,8 @@ public class MainMenuController implements Initializable {
 
     private void initializeMenuListeners() {
         menuNewFromDot.setOnAction(event -> {
+            if(cancelOverwrite()) return;
+
             FileChooser fileChooser = new FileChooser();
             fileChooser.setTitle("Load from DOT file");
             File chosenFile = chooseLocation(fileChooser, false);
@@ -154,11 +156,20 @@ public class MainMenuController implements Initializable {
                 PertGraf.setInstance(PertGraf.createFromDotFile(chosenFile.getPath()));
                 displayGraf();
             } catch (FileNotFoundException e) {
+                Alert alert = new Alert(Alert.AlertType.ERROR);
+                alert.setTitle("Error");
+                alert.setHeaderText("An error occurred while loading the file");
+                alert.setContentText(e.toString());
+
+                alert.showAndWait();
+            } catch (NullPointerException e) {
                 e.printStackTrace();
             }
         });
 
         menuNewFromPert.setOnAction(event -> {
+            if(cancelOverwrite()) return;
+
             FileChooser fileChooser = new FileChooser();
             fileChooser.setTitle("Load from PERT file");
             File chosenFile = chooseLocation(fileChooser, false);
@@ -167,16 +178,66 @@ public class MainMenuController implements Initializable {
                 PertGraf.setInstance(PertGraf.createFromPertFile(chosenFile.getPath()));
                 displayGraf();
             } catch (FileNotFoundException | InvalidFormatException e) {
+                Alert alert = new Alert(Alert.AlertType.ERROR);
+                alert.setTitle("Error");
+                alert.setHeaderText("An error occurred while loading the file");
+                alert.setContentText(e.toString());
+
+                alert.showAndWait();
+            } catch (NullPointerException e) {
                 e.printStackTrace();
             }
         });
 
         menuNewWithRange.setOnAction(event -> {
-            //TODO
+            if(cancelOverwrite()) return;
+
+            TextInputDialog dialog = new TextInputDialog("1");
+            dialog.setTitle("Creating a new graph");
+            dialog.setHeaderText("Chose the amount of nodes generated");
+            dialog.setContentText("Enter a number : ");
+
+            boolean success = false;
+            do {
+                Optional<String> result = dialog.showAndWait();
+                try {
+                    if(result.isPresent()) {
+                        int numberOfNodes = Integer.parseInt(result.get());
+
+                        success = true;
+                        PertGraf.resetInstance();
+                        String alphabet = "ABCDEFGHIJKLMNOPQRSTUVWYZ";
+                        StringBuilder buffer = new StringBuilder();
+
+                        for(int i = 0; i < numberOfNodes; i++) {
+                            final String name = buffer.toString() + alphabet.charAt(i % 26);
+                            PertGraf.getInstance().addNode(new Task(name, (name).toLowerCase(), i));
+                            int timesFirst = i / 26;
+                            if(timesFirst != 0) {
+                                if(buffer.length() == 0) buffer.append(alphabet.charAt(timesFirst % 26));
+                                else buffer.setCharAt(0, alphabet.charAt(timesFirst % 26));
+                            }
+                            int timesSecond = timesFirst / 26;
+                            if(timesSecond != 0) {
+                                if(buffer.length() == 0) buffer.append(alphabet.charAt(timesSecond % 26));
+                                else buffer.setCharAt(1, alphabet.charAt(timesSecond % 26));
+                            }
+                        }
+
+                        displayGraf();
+                    }
+                } catch (NumberFormatException e) {
+                    dialog.setContentText("Enter a number : \nThat was not a valid input");
+                }
+            } while(!success);
         });
 
         menuNewEmpty.setOnAction(event -> {
-            //TODO
+            if(cancelOverwrite()) return;
+
+            PertGraf.resetInstance();
+
+            displayGraf();
         });
 
         menuExportDot.setOnAction(event -> {
@@ -191,9 +252,11 @@ public class MainMenuController implements Initializable {
                     Alert alert = new Alert(Alert.AlertType.ERROR);
                     alert.setTitle("Error !");
                     alert.setHeaderText(null);
-                    alert.setContentText("An error has occured, export aborted.");
+                    alert.setContentText("An error has occurred, export aborted.");
 
                     alert.showAndWait();
+                } catch (NullPointerException e) {
+                    e.printStackTrace();
                 }
             }
         });
@@ -214,9 +277,11 @@ public class MainMenuController implements Initializable {
                     Alert alert = new Alert(Alert.AlertType.ERROR);
                     alert.setTitle("Error !");
                     alert.setHeaderText(null);
-                    alert.setContentText("An error has occured, export aborted.");
+                    alert.setContentText("An error has occurred, export aborted.");
 
                     alert.showAndWait();
+                } catch (NullPointerException e) {
+                    e.printStackTrace();
                 }
             }
         });
@@ -270,9 +335,9 @@ public class MainMenuController implements Initializable {
             alert.getButtonTypes().setAll(buttonSave, buttonPNG, buttonCancel);
 
             Optional<ButtonType> result = alert.showAndWait();
-            if (result.get() == buttonSave) {
+            if (result.isPresent() && result.get() == buttonSave) {
                 PertGraf.setInstance((PertGraf) PertGraf.getInstance().getTransitiveClosure());
-            } else if (result.get() == buttonPNG) {
+            } else if (result.isPresent() && result.get() == buttonPNG) {
                 //TODO print as png
             }
         });
@@ -420,11 +485,11 @@ public class MainMenuController implements Initializable {
         });
 
         class NewNodeInfos {
-            String name;
-            String label;
-            int duration;
+            private String name;
+            private String label;
+            private int duration;
 
-            NewNodeInfos(String name, String label, int duration) {
+            private NewNodeInfos(String name, String label, int duration) {
                 this.name = name;
                 this.label = label;
                 this.duration = duration;
@@ -448,7 +513,7 @@ public class MainMenuController implements Initializable {
             nodeName.setPromptText("Task name");
             TextField nodeLabel = new TextField();
             nodeLabel.setPromptText("Task label");
-            Spinner nodeDuration = new Spinner();
+            Spinner<Integer> nodeDuration = new Spinner<>();
             nodeDuration.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(-9999, 9999, 0));
 
             grid.add(new Label("Task name:"), 0, 0);
@@ -469,9 +534,7 @@ public class MainMenuController implements Initializable {
 
 
             Optional<NewNodeInfos> result = dialog.showAndWait();
-            result.ifPresent(content -> {
-                PertGraf.getInstance().addNode(new Task(content.name, content.label, content.duration));
-            });
+            result.ifPresent(content -> PertGraf.getInstance().addNode(new Task(content.name, content.label, content.duration)));
         });
 
         featureAddEdge.setOnAction(event -> {
@@ -531,6 +594,21 @@ public class MainMenuController implements Initializable {
             }
         });
     }
+
+    private boolean cancelOverwrite() {
+        if(!PertGraf.getInstance().adjList.isEmpty()) {
+            Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+            alert.setTitle("Confirm overwrite");
+            alert.setHeaderText("You're about to overwrite the current graph");
+            alert.setContentText("Are you sure ?");
+
+            Optional<ButtonType> result = alert.showAndWait();
+            return !result.isPresent() || result.get() != ButtonType.OK;
+        }
+
+        return false;
+    }
+
     void setObserver(UserInterface u){
         this.userInterface = u;
     }
