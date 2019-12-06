@@ -19,6 +19,7 @@ import java.util.*;
 public class MainMenuController implements Initializable {
     private UserInterface userInterface;
     private static DisplayType selectedDisplayType = DisplayType.DOT_FORMAT;
+    private File savedDirectory;
 
     private enum DisplayType {
         PERT_FORMAT,
@@ -121,11 +122,33 @@ public class MainMenuController implements Initializable {
         }
     }
 
+    private File chooseLocation(FileChooser fc, boolean saveMode) {
+        if (savedDirectory != null && savedDirectory.exists()) {
+            fc.setInitialDirectory(savedDirectory);
+        }
+        File chosenFile;
+        if (saveMode) {
+            chosenFile = fc.showSaveDialog(userInterface.primaryStage);
+        }
+        else {
+            chosenFile = fc.showOpenDialog(userInterface.primaryStage);
+        }
+        if (chosenFile != null) {
+            if (chosenFile.isDirectory()) {
+                savedDirectory = chosenFile;
+            }
+            else {
+                savedDirectory = chosenFile.getParentFile();
+            }
+        }
+        return chosenFile;
+    }
+
     private void initializeMenuListeners() {
         menuNewFromDot.setOnAction(event -> {
             FileChooser fileChooser = new FileChooser();
             fileChooser.setTitle("Load from DOT file");
-            File chosenFile = fileChooser.showOpenDialog(userInterface.primaryStage);
+            File chosenFile = chooseLocation(fileChooser, false);
             //TODO error handling
             try {
                 PertGraf.setInstance(PertGraf.createFromDotFile(chosenFile.getPath()));
@@ -138,7 +161,7 @@ public class MainMenuController implements Initializable {
         menuNewFromPert.setOnAction(event -> {
             FileChooser fileChooser = new FileChooser();
             fileChooser.setTitle("Load from PERT file");
-            File chosenFile = fileChooser.showOpenDialog(userInterface.primaryStage);
+            File chosenFile = chooseLocation(fileChooser, false);
             //TODO error handling
             try {
                 PertGraf.setInstance(PertGraf.createFromPertFile(chosenFile.getPath()));
@@ -158,7 +181,7 @@ public class MainMenuController implements Initializable {
 
         menuExportDot.setOnAction(event -> {
             FileChooser fileChooser = new FileChooser();
-            File file = fileChooser.showSaveDialog(userInterface.primaryStage);
+            File file = chooseLocation(fileChooser, true);
 
             if (file != null) {
                 try {
