@@ -153,8 +153,18 @@ public class MainMenuController implements Initializable {
             File chosenFile = chooseLocation(fileChooser, false);
             //TODO error handling
             try {
-                PertGraf.setInstance(PertGraf.createFromDotFile(chosenFile.getPath()));
-                displayGraf();
+                try
+                {
+                    PertGraf.setInstance(PertGraf.createFromDotFile(chosenFile.getPath()));
+                    displayGraf();
+                } catch(IndexOutOfBoundsException e) {
+                    Alert alert = new Alert(Alert.AlertType.ERROR);
+                    alert.setTitle("Error");
+                    alert.setHeaderText("An error occurred while loading the file");
+                    alert.setContentText("The file is not in the correct format.");
+
+                    alert.showAndWait();
+                }
             } catch (FileNotFoundException e) {
                 Alert alert = new Alert(Alert.AlertType.ERROR);
                 alert.setTitle("Error");
@@ -438,17 +448,40 @@ public class MainMenuController implements Initializable {
 
             Optional<String> result = dialog.showAndWait();
             result.ifPresent(s -> {
-                Alert alert = new Alert(Alert.AlertType.INFORMATION);
-                alert.setTitle("Computed result");
-                alert.setHeaderText("List scheduling result : ");
-                StringBuilder sb = new StringBuilder();
-                for (Node n : PertGraf.getInstance().computeListScheduling(Integer.parseInt(s))) {
-                    sb.append(n.toString());
-                    sb.append("\n");
-                }
-                alert.setContentText(sb.toString());
+                List<String> choices = new ArrayList<>();
+                choices.add("Longest path algorithm");
+                choices.add("Critical path method");
+                choices.add("Longest processing time");
+                choices.add("Highest level first algorithm");
+                choices.add("HEFT algorithm (Heterogeneous Earliest Finish Time)");
 
-                alert.showAndWait();
+                ChoiceDialog<String> dialogStrategy = new ChoiceDialog<>("Longest path algorithm", choices);
+                dialogStrategy.setTitle("Preparation");
+                dialogStrategy.setHeaderText("List scheduling");
+                dialogStrategy.setContentText("Pick a strategy : ");
+
+                Optional<String> resultStrategy = dialogStrategy.showAndWait();
+
+                resultStrategy.ifPresent(choiceStrategy -> {
+                    Map<String, SchedulingStrategies> strategies = new HashMap<>();
+                    strategies.put("Longest path algorithm", SchedulingStrategies.LONGEST_PATH);
+                    strategies.put("Critical path method", SchedulingStrategies.CRITICAL_PATH);
+                    strategies.put("Longest processing time", SchedulingStrategies.LONGEST_PROCESSING_TIME);
+                    strategies.put("Highest level first algorithm", SchedulingStrategies.HLF_ALGORITHM);
+                    strategies.put("HEFT algorithm (Heterogeneous Earliest Finish Time)", SchedulingStrategies.HEFT_ALGORITHM);
+
+                    Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                    alert.setTitle("Computed result");
+                    alert.setHeaderText("List scheduling result : ");
+                    StringBuilder sb = new StringBuilder();
+                    for (Node n : PertGraf.getInstance().computeListScheduling(Integer.parseInt(s), strategies.get(choiceStrategy))) {
+                        sb.append(n.toString());
+                        sb.append("\n");
+                    }
+                    alert.setContentText(sb.toString());
+
+                    alert.showAndWait();
+                });
             });
         });
     }
@@ -527,7 +560,7 @@ public class MainMenuController implements Initializable {
 
             dialog.setResultConverter(dialogButton -> {
                 if (dialogButton == confirmButtonType) {
-                    return new NewNodeInfos(nodeName.getText(), nodeLabel.getText(), (Integer) nodeDuration.getValue());
+                    return new NewNodeInfos(nodeName.getText(), nodeLabel.getText(), nodeDuration.getValue());
                 }
                 return null;
             });

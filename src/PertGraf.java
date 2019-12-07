@@ -44,7 +44,7 @@ public class PertGraf extends Graf {
         return createPertGrafFromTaskRawList(tasks); // TODO : Pas fini >> AH!
     }
 
-    static PertGraf createFromDotFile(String path) throws FileNotFoundException {
+    static PertGraf createFromDotFile(String path) throws FileNotFoundException, IndexOutOfBoundsException {
         StringBuilder sb = new StringBuilder();
 
         FileReader input = new FileReader(path);
@@ -106,7 +106,7 @@ public class PertGraf extends Graf {
         return pert;
     }
 
-    static PertGraf createPertGrafFromDotString(String dotString) {
+    static PertGraf createPertGrafFromDotString(String dotString) throws IndexOutOfBoundsException{
         PertGraf p = new PertGraf();
         String[] dotStringLines = dotString.split("\n");
 
@@ -365,8 +365,8 @@ public class PertGraf extends Graf {
         return endingTasks;
     }
 
-    List<Task> computeListScheduling(int numberOfWorkers) {
-        HashSet<Task> working = new HashSet<>();
+    List<Task> computeListScheduling(int numberOfWorkers, SchedulingStrategies schedulingStrategy) {
+        ArrayList<Task> working = new ArrayList<>();
         HashSet<Task> done = new HashSet<>();
         HashSet<Node> remaining = new HashSet<>(this.adjList.keySet());
         LinkedList<Task> scheduling = new LinkedList<>();
@@ -374,8 +374,12 @@ public class PertGraf extends Graf {
         while(!remaining.isEmpty()) {
             while(working.size() < numberOfWorkers && remaining.size() > working.size()) {
                 Task toWork = getHighestPriorityTask(
-                        getPendingTasks(done, working)
+                        getPendingTasks(done, working),
+                        schedulingStrategy
                 );
+
+                if(toWork == null) break;
+
                 working.add(toWork);
                 scheduling.add(toWork);
             }
@@ -393,7 +397,7 @@ public class PertGraf extends Graf {
         return scheduling;
     }
 
-    private Set<Node> getPendingTasks(HashSet<Task> done, HashSet<Task> working) {
+    private Set<Node> getPendingTasks(HashSet<Task> done, ArrayList<Task> working) {
         HashSet<Node> availableTasks = new HashSet<>(this.adjList.keySet());
 
         for (Map.Entry<Node, ArrayList<Node>> entry : this.adjList.entrySet()) {
@@ -415,7 +419,27 @@ public class PertGraf extends Graf {
 
     boolean checkPertIsTree(){return true;} //TODO implement ? or not ? or checkTaskValid
 
-    private Task getHighestPriorityTask(Set<Node> pending) {
+    private Task getHighestPriorityTask(Set<Node> pending, SchedulingStrategies s) {
+        switch(s) {
+            case LONGEST_PATH:
+                return highestPriorityTaskLongestPath(pending);
+            case CRITICAL_PATH:
+
+                break;
+            case HEFT_ALGORITHM:
+                return highestPriorityTaskHEFT(pending);
+            case HLF_ALGORITHM:
+
+                break;
+            case LONGEST_PROCESSING_TIME:
+
+                break;
+        }
+
+        return null;
+    }
+
+    private Task highestPriorityTaskLongestPath(Set<Node> pending) {
         //TODO : add final node to pert to use time of last task
         Map<Deque<Node>, Integer> longestPaths = new HashMap<>();
 
@@ -437,6 +461,21 @@ public class PertGraf extends Graf {
             return (Task) longestEntry.getKey().getFirst();
         }
         return null;
+    }
+
+    private Task highestPriorityTaskHEFT(Set<Node> pending) {
+        Map<Node, Integer> endTimes = computeLateTimesFromEnd(Integer.MAX_VALUE);
+        Integer latestEndTime = Integer.MAX_VALUE;
+        Node latestEndNode = null;
+
+        for(Node n : pending) {
+            if(latestEndTime > endTimes.get(n)) {
+                latestEndTime = endTimes.get(n);
+                latestEndNode = n;
+            }
+        }
+
+        return (Task) latestEndNode;
     }
 
     LongestPathInfo<Deque<Node>, Integer> computeLongestPathFrom(Node startingNode) { //TODO support multiple longest paths
