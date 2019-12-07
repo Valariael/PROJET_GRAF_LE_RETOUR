@@ -384,13 +384,14 @@ public class PertGraf extends Graf {
                 scheduling.add(toWork);
             }
 
-            for(Task t : working) {
+            for(int i = 0; i < working.size(); ) {
+                Task t = working.get(i);
                 t.incrementWorkedTimes();
                 if(t.getWorkedTimes() == t.getDuration()) {
                     working.remove(t);
                     remaining.remove(t);
                     done.add(t);
-                }
+                } else i++;
             }
         }
 
@@ -424,7 +425,7 @@ public class PertGraf extends Graf {
             case LONGEST_PATH:
                 return highestPriorityTaskLongestPath(pending);
             case CRITICAL_PATH:
-
+                //TODO implement
                 break;
             case HEFT_ALGORITHM:
                 return highestPriorityTaskHEFT(pending);
@@ -468,6 +469,7 @@ public class PertGraf extends Graf {
         Integer latestEndTime = Integer.MAX_VALUE;
         Node latestEndNode = null;
 
+        //TODO fix infinity loop
         for(Node n : pending) {
             if(latestEndTime > endTimes.get(n)) {
                 latestEndTime = endTimes.get(n);
