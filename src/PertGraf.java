@@ -1,7 +1,7 @@
 import java.io.*;
 import java.util.*;
 
-public class PertGraf extends Graf {
+public class PertGraf extends Graf implements Cloneable {
     private static final String PERT_START_NODE = "starting_node";
     private static final String PERT_END_NODE = "ending_node";
     private static final String DOT_SEPARATOR = "==";
@@ -10,12 +10,15 @@ public class PertGraf extends Graf {
 
     private PertGraf() {}
 
-    static PertGraf getInstance()
-    {
+    static PertGraf getInstance() {
         if (pertInstance == null)
         {   pertInstance = new PertGraf();
         }
         return pertInstance;
+    }
+
+    static PertGraf newInstance() {
+        return new PertGraf();
     }
 
     static void resetInstance() {
@@ -245,10 +248,9 @@ public class PertGraf extends Graf {
 
     private void computeCriticalPathsRec(List<List<Node>> paths, List<Node> currentPath, Map<Node, Integer> earliestTimes, Map<Node, Integer> latestTimes, List<Node> currentNode) {
         boolean found = false;
+
         for (Node node : currentNode) {
-            System.out.println("[critical] Current: " + node.getName());
             if (earliestTimes.get(node).equals(latestTimes.get(node))) {
-                System.out.println("Found");
                 if (!found) {
                     currentPath.add(node);
                     computeCriticalPathsRec(paths, currentPath, earliestTimes, latestTimes, adjList.get(node));
@@ -264,29 +266,16 @@ public class PertGraf extends Graf {
     }
 
     List<List<Node>> computeCriticalPaths() {
-        Task startingNode = addStartingTask(getStartingTasks()); //TODO keep starting node in pert ?
+        Task startingNode = addStartingTask(getStartingTasks());
         Task endingNode = addEndingTask(getEndingTasks());
 
         Map<Node, Integer> earliestTimes = computeEarlyTimes();
-        System.out.println("Earliest...");
-        for (Map.Entry<Node, Integer> entry : earliestTimes.entrySet()) {
-            System.out.println(entry.getKey().getName() + " : " + entry.getValue());
-        }
 
         PertGraf reversed = getReversePert();
         Map<Node, Integer> latestTimes = reversed.computeLateTimesFromEnd(earliestTimes.get(endingNode));
-        System.out.println("Latest...");
-        for (Map.Entry<Node, Integer> entry : latestTimes.entrySet()) {
-            System.out.println(entry.getKey().getName() + " : " + entry.getValue());
-        }
 
         removeNode(startingNode);
         removeEndingTask();
-
-        System.out.println("Critical nodes : ");
-        for(Map.Entry<Node, Integer> entry : earliestTimes.entrySet()) {
-            if(latestTimes.get(entry.getKey()).equals(entry.getValue())) System.out.println(entry.getKey().toString());
-        }
 
         List<List<Node>> criticalsPaths = new ArrayList<>();
         ArrayList<Node> startingTasks = getStartingTasks();
@@ -425,23 +414,22 @@ public class PertGraf extends Graf {
             case LONGEST_PATH:
                 return highestPriorityTaskLongestPath(pending);
             case CRITICAL_PATH:
-                //TODO implement
-                break;
+                return highestPriorityTaskCriticalPath(pending);
             case HEFT_ALGORITHM:
                 return highestPriorityTaskHEFT(pending);
-            case HLF_ALGORITHM:
-
-                break;
+            case SHORTEST_PROCESSING_TIME:
+                return highestPriorityTaskSPT(pending);
             case LONGEST_PROCESSING_TIME:
-
-                break;
+                return highestPriorityTaskLPT(pending);
         }
 
         return null;
     }
 
     private Task highestPriorityTaskLongestPath(Set<Node> pending) {
-        //TODO : add final node to pert to use time of last task
+        Task startingNode = addStartingTask(getStartingTasks());
+        addEndingTask(getEndingTasks());
+
         Map<Deque<Node>, Integer> longestPaths = new HashMap<>();
 
         for (Node currentTask : pending) {
@@ -457,6 +445,9 @@ public class PertGraf extends Graf {
             }
         }
 
+        removeNode(startingNode);
+        removeEndingTask();
+
         //return its first task
         if (longestEntry != null) {
             return (Task) longestEntry.getKey().getFirst();
@@ -465,11 +456,14 @@ public class PertGraf extends Graf {
     }
 
     private Task highestPriorityTaskHEFT(Set<Node> pending) {
-        Map<Node, Integer> endTimes = computeLateTimesFromEnd(Integer.MAX_VALUE);
+        Task startingNode = addStartingTask(getStartingTasks()); //TODO keep starting node in pert ?
+        addEndingTask(getEndingTasks());
+
+        PertGraf reversed = getReversePert();
+        Map<Node, Integer> endTimes = reversed.computeLateTimesFromEnd(Integer.MAX_VALUE);
         Integer latestEndTime = Integer.MAX_VALUE;
         Node latestEndNode = null;
 
-        //TODO fix infinity loop
         for(Node n : pending) {
             if(latestEndTime > endTimes.get(n)) {
                 latestEndTime = endTimes.get(n);
@@ -477,7 +471,74 @@ public class PertGraf extends Graf {
             }
         }
 
+        removeNode(startingNode);
+        removeEndingTask();
+
         return (Task) latestEndNode;
+    }
+
+    private Task highestPriorityTaskLPT(Set<Node> pending) {
+        int longestProcTime = Integer.MIN_VALUE;
+        Task longestProcTimeNode = null;
+
+        for(Node n : pending) {
+            Task current = (Task) n;
+            if(longestProcTime < current.getDuration()) {
+                longestProcTime = current.getDuration();
+                longestProcTimeNode = current;
+            }
+        }
+
+        return longestProcTimeNode;
+    }
+
+    private Task highestPriorityTaskSPT(Set<Node> pending) {
+        int shortestProcTime = Integer.MAX_VALUE;
+        Task shortestProcTimeNode = null;
+
+        for(Node n : pending) {
+            Task current = (Task) n;
+            if(shortestProcTime > current.getDuration()) {
+                shortestProcTime = current.getDuration();
+                shortestProcTimeNode = current;
+            }
+        }
+
+        return shortestProcTimeNode;
+    }
+
+    private Task highestPriorityTaskCriticalPath(Set<Node> pending) {
+        PertGraf currentPert = PertGraf.getInstance();
+        PertGraf newPert = PertGraf.newInstance();
+
+        for(Node n : currentPert.getAllNodes()) {
+            newPert.addNode(n);
+        }
+        for(Edge e : currentPert.getAllEdges()) {
+            newPert.addEdge(e);
+        }
+
+        newPert.removeAncestors(pending);
+
+        List<Task> pendingList = new ArrayList<>();
+        for(Node n : pending) {
+            pendingList.add((Task) n);
+        }
+        pendingList.sort(Comparator.comparing(Task::getDuration));
+
+        List<List<Node>> critPaths = newPert.computeCriticalPaths();
+        for (int i = pendingList.size()-1; i >= 0; i--) {
+            Node pendingNode = pendingList.get(i);
+            for (List<Node> path : critPaths) {
+                for (Node n : path) {
+                    if (n.getName().equals(pendingNode.getName())) return (Task) n;
+                }
+            }
+        }
+
+        if(!pendingList.isEmpty()) return pendingList.get(pendingList.size()-1);
+
+        return null;
     }
 
     LongestPathInfo<Deque<Node>, Integer> computeLongestPathFrom(Node startingNode) { //TODO support multiple longest paths
@@ -682,5 +743,21 @@ public class PertGraf extends Graf {
         BufferedWriter writer = new BufferedWriter(new FileWriter(path));
         writer.write(this.toPertString());
         writer.close();
+    }
+
+    private void removeAncestors(Set<Node> pending) {
+        for(Node n : pending) {
+            List<Edge> inEdges = getInEdges(n);
+            Set<Node> ancestors = new HashSet<>();
+            for(Edge e : inEdges) {
+                ancestors.add(e.getHead());
+            }
+
+            removeAncestors(ancestors);
+
+            for(Node a : ancestors) {
+                removeNode(a);
+            }
+        }
     }
 }

@@ -207,14 +207,14 @@ public class MainMenuController implements Initializable {
             dialog.setHeaderText("Chose the amount of nodes generated");
             dialog.setContentText("Enter a number : ");
 
-            boolean success = false;
+            boolean success;
             do {
                 Optional<String> result = dialog.showAndWait();
                 try {
+                    success = true;
                     if(result.isPresent()) {
                         int numberOfNodes = Integer.parseInt(result.get());
 
-                        success = true;
                         PertGraf.resetInstance();
                         String alphabet = "ABCDEFGHIJKLMNOPQRSTUVWYZ";
                         StringBuilder buffer = new StringBuilder();
@@ -237,6 +237,7 @@ public class MainMenuController implements Initializable {
                         displayGraf();
                     }
                 } catch (NumberFormatException e) {
+                    success = false;
                     dialog.setContentText("Enter a number : \nThat was not a valid input");
                 }
             } while(!success);
@@ -452,7 +453,7 @@ public class MainMenuController implements Initializable {
                 choices.add("Longest path algorithm");
                 choices.add("Critical path method");
                 choices.add("Longest processing time");
-                choices.add("Highest level first algorithm");
+                choices.add("Shortest processing time");
                 choices.add("HEFT algorithm (Heterogeneous Earliest Finish Time)");
 
                 ChoiceDialog<String> dialogStrategy = new ChoiceDialog<>("Longest path algorithm", choices);
@@ -467,7 +468,7 @@ public class MainMenuController implements Initializable {
                     strategies.put("Longest path algorithm", SchedulingStrategies.LONGEST_PATH);
                     strategies.put("Critical path method", SchedulingStrategies.CRITICAL_PATH);
                     strategies.put("Longest processing time", SchedulingStrategies.LONGEST_PROCESSING_TIME);
-                    strategies.put("Highest level first algorithm", SchedulingStrategies.HLF_ALGORITHM);
+                    strategies.put("Shortest processing time", SchedulingStrategies.SHORTEST_PROCESSING_TIME);
                     strategies.put("HEFT algorithm (Heterogeneous Earliest Finish Time)", SchedulingStrategies.HEFT_ALGORITHM);
 
                     Alert alert = new Alert(Alert.AlertType.INFORMATION);
@@ -481,7 +482,7 @@ public class MainMenuController implements Initializable {
                     alert.setContentText(sb.toString());
 
                     alert.showAndWait();
-                });
+                }); //TODO fix blocking LPT + SPT + HEFT when not in debug !!!!
             });
         });
     }
