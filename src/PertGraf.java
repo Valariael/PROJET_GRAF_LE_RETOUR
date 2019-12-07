@@ -17,7 +17,7 @@ public class PertGraf extends Graf implements Cloneable {
         return pertInstance;
     }
 
-    static PertGraf newInstance() {
+    private static PertGraf newInstance() {
         return new PertGraf();
     }
 
@@ -109,7 +109,7 @@ public class PertGraf extends Graf implements Cloneable {
         return pert;
     }
 
-    static PertGraf createPertGrafFromDotString(String dotString) throws IndexOutOfBoundsException{
+    private static PertGraf createPertGrafFromDotString(String dotString) throws IndexOutOfBoundsException{
         PertGraf p = new PertGraf();
         String[] dotStringLines = dotString.split("\n");
 
@@ -376,13 +376,15 @@ public class PertGraf extends Graf implements Cloneable {
             for(int i = 0; i < working.size(); ) {
                 Task t = working.get(i);
                 t.incrementWorkedTimes();
-                if(t.getWorkedTimes() == t.getDuration()) {
+                if(t.getWorkedTimes() >= t.getDuration()) {
                     working.remove(t);
                     remaining.remove(t);
                     done.add(t);
                 } else i++;
             }
         }
+
+        resetWorkedTimes();
 
         return scheduling;
     }
@@ -474,6 +476,7 @@ public class PertGraf extends Graf implements Cloneable {
         removeNode(startingNode);
         removeEndingTask();
 
+        System.out.println("here HEFT end");
         return (Task) latestEndNode;
     }
 
@@ -743,6 +746,10 @@ public class PertGraf extends Graf implements Cloneable {
         BufferedWriter writer = new BufferedWriter(new FileWriter(path));
         writer.write(this.toPertString());
         writer.close();
+    }
+
+    private void resetWorkedTimes() {
+        adjList.forEach((nodeFrom, nodeList) -> ((Task) nodeFrom).resetWorkedTimes());
     }
 
     private void removeAncestors(Set<Node> pending) {

@@ -52,6 +52,10 @@ public class Task extends Node {
         workedTimes++;
     }
 
+    void resetWorkedTimes() {
+        workedTimes = 0;
+    }
+
     @Override
     public int hashCode() {
         return this.getName().hashCode();
