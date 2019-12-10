@@ -1,3 +1,6 @@
+/**
+ * This class represents tasks that can be used in a PERT graph, more precisely a PertGraf instance..
+ */
 public class Task extends Node {
     private String label;
     private int duration;
@@ -5,12 +8,6 @@ public class Task extends Node {
 
     Task(String name) {
         super(name);
-        this.setToLabel(0);
-    }
-
-    Task(String name, String label) {//TODO remove unused
-        super(name);
-        this.label = label;
         this.setToLabel(0);
     }
 
@@ -30,10 +27,6 @@ public class Task extends Node {
 
     String getLabel() {
         return label;
-    }
-
-    void setLabel(String label) {
-        this.label = label;
     }
 
     int getDuration() {

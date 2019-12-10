@@ -20,11 +20,17 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.*;
 
+/**
+ * Controller class for the main user interface 'main_menu.xml'.
+ */
 public class MainMenuController implements Initializable {
     private UserInterface userInterface;
     private static DisplayType selectedDisplayType = DisplayType.PERT_FORMAT;
     private File savedDirectory;
 
+    /**
+     * Enumeration of the display modes.
+     */
     private enum DisplayType {
         PERT_FORMAT,
         DOT_FORMAT,
@@ -81,6 +87,7 @@ public class MainMenuController implements Initializable {
         initializeButtonListeners();
     }
 
+    //TODO
     private void computeChangesAndSwitch(DisplayType d) {
         switch (selectedDisplayType) {
             case PERT_FORMAT:
@@ -94,6 +101,9 @@ public class MainMenuController implements Initializable {
         selectedDisplayType = d;
     }
 
+    /**
+     * Writes the representation of the graph in the TextArea in the selected mode.
+     */
     void displayGraf() {
         switch (selectedDisplayType) {
             case PERT_FORMAT:
@@ -125,6 +135,12 @@ public class MainMenuController implements Initializable {
         }
     }
 
+    /**
+     *
+     * @param fc
+     * @param saveMode
+     * @return
+     *///TODO
     private File chooseLocation(FileChooser fc, boolean saveMode) {
         if (savedDirectory != null && savedDirectory.exists()) {
             fc.setInitialDirectory(savedDirectory);
@@ -147,6 +163,9 @@ public class MainMenuController implements Initializable {
         return chosenFile;
     }
 
+    /**
+     * Displays a generated PNG of the PERT graph in a new window.
+     */
     private void displayPng() {
         String tempName = "tmp_graf";
 
@@ -188,6 +207,9 @@ public class MainMenuController implements Initializable {
         pngStage.show();
     }
 
+    /**
+     * Sets all the listeners of the menu items.
+     */
     private void initializeMenuListeners() {
         menuNewFromDot.setOnAction(event -> {
             if(cancelOverwrite()) return;
@@ -542,6 +564,9 @@ public class MainMenuController implements Initializable {
         });
     }
 
+    /**
+     * Sets all the listeners of the buttons on the left side of the window.
+     */
     private void initializeButtonListeners() {
         displayPertFormat.setOnAction(event -> {
             computeChangesAndSwitch(DisplayType.PERT_FORMAT);
@@ -686,6 +711,11 @@ public class MainMenuController implements Initializable {
         });
     }
 
+    /**
+     * Displays an alert window to confirm or cancel overwrite.
+     *
+     * @return 'true' if confirmed, 'false' otherwise
+     */
     private boolean cancelOverwrite() {
         if(!PertGraf.getInstance().adjList.isEmpty()) {
             Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
@@ -700,6 +730,11 @@ public class MainMenuController implements Initializable {
         return false;
     }
 
+    /**
+     * Sets the reference to the UserInterface instance.
+     *
+     * @param u the UserInterface instance
+     */
     void setObserver(UserInterface u){
         this.userInterface = u;
     }

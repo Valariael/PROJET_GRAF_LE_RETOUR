@@ -7,6 +7,9 @@ import javafx.stage.Stage;
 import java.io.FileInputStream;
 import java.io.IOException;
 
+/**
+ * Main class used to create the JavaFX application for the PERT Project.
+ */
 public class UserInterface extends Application
 {
     Stage primaryStage;

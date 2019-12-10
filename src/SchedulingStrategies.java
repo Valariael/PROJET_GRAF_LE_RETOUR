@@ -1,3 +1,6 @@
+/**
+ * Enumeration of the scheduling strategies.
+ */
 enum SchedulingStrategies {
     LONGEST_PATH,
     CRITICAL_PATH,

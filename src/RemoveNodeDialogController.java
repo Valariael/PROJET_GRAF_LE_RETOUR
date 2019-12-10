@@ -6,11 +6,13 @@ import javafx.scene.control.Toggle;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
-
 import java.net.URL;
 import java.util.List;
 import java.util.ResourceBundle;
 
+/**
+ * Controller class for the Remove Node interface 'remove_node_dialog.xml'.
+ */
 public class RemoveNodeDialogController implements Initializable {
     private Stage stage;
     private List<Node> nodes;
@@ -61,10 +63,20 @@ public class RemoveNodeDialogController implements Initializable {
         });
     }
 
+    /**
+     * Sets the reference to the Stage instance of the main window.
+     *
+     * @param u the Stage instance
+     */
     void setObserver(Stage u) {
         this.stage = u;
     }
 
+    /**
+     * Sets the reference to the MainController instance.
+     *
+     * @param u the MainController instance
+     */
     void setOriginController(MainMenuController u) {
         this.mainController = u;
     }

@@ -1,5 +1,8 @@
 import java.util.Set;
 
+/**
+ * Task data class used to temporarily store the tasks' information.
+ */
 class TaskRaw {
     private String name;
     private String label;
