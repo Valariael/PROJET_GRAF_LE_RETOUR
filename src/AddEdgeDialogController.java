@@ -2,10 +2,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.control.Button;
-import javafx.scene.control.RadioButton;
-import javafx.scene.control.Toggle;
-import javafx.scene.control.ToggleGroup;
+import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import java.net.URL;
@@ -35,8 +32,7 @@ public class AddEdgeDialogController implements Initializable {
     public AddEdgeDialogController() {}
 
     @Override
-    public void initialize(URL location, ResourceBundle resources)
-    {
+    public void initialize(URL location, ResourceBundle resources) {
         addEdgeDialogFromBox.setPadding(new Insets(5));
         addEdgeDialogFromBox.setAlignment(Pos.CENTER);
         addEdgeDialogToBox.setPadding(new Insets(5));
@@ -73,9 +69,18 @@ public class AddEdgeDialogController implements Initializable {
             if(fromNode != null && toNode != null) {
                 Task toTask = new Task(toNode.getName(), toNode.getLabel(), ((Task) toNode).getDuration(), ((Task) fromNode).getDuration());
                 toTask.setToWeightActivated(true);
-                PertGraf.getInstance().addEdge(fromNode, toTask);
-                mainController.displayGraf();
-                stage.close();
+                if (!PertGraf.getInstance().pathExists(toTask, fromNode)) {
+                    PertGraf.getInstance().addEdge(fromNode, toTask);
+                    mainController.displayGraf();
+                    stage.close();
+                }
+                else {
+                    Alert alert = new Alert(Alert.AlertType.ERROR);
+                    alert.setTitle("Impossible add!");
+                    alert.setHeaderText(null);
+                    alert.setContentText("Loops aren't possible in a Pert Graf");
+                    alert.showAndWait();
+                }
             }
         });
 

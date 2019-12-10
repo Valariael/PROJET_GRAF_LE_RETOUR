@@ -818,6 +818,44 @@ public class PertGraf extends Graf {
     }
 
     /**
+     * Recursivly search if a path exists between 2 nodes.
+     *
+     * @param from The starting node.
+     * @param to The ending node.
+     * @param covered The covered nodes until now.
+     * @return <code>true</code> if a path was found, <code>false</code> if not.
+     */
+    private boolean pathExistsRec(Node from, Node to, Set<Node> covered) {
+        if (from.equals(to)) {
+            return true;
+        }
+        if (covered.contains(from)) {
+            return false;
+        }
+        covered.add(from);
+        List<Edge> edges = getOutEdges(from);
+        for (Edge edge : edges) {
+            Node node = edge.getTail();
+            if (pathExistsRec(node, to, covered)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Search if a path exists between 2 nodes.
+     *
+     * @param from The starting node.
+     * @param to The ending node we're searching for.
+     * @return <code>true</code> if a path was found, <code>false</code> if not.
+     */
+    public boolean pathExists(Node from, Node to) {
+        Set<Node> covered = new HashSet<>();
+        return pathExistsRec(from, to, covered);
+    }
+
+    /**
      * Computes the representation of the graph in the DOT formalism.
      *
      * @return The String object containing the DOT representation of the graph.
