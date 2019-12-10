@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/10.0.2-internal" xmlns:fx="http://javafx.com/fxml/1" fx:controller="RemoveEdgeDialogController">
+    <bottom>
+        <ButtonBar prefHeight="32.0" prefWidth="600.0" BorderPane.alignment="CENTER">
+            <buttons>
+                <Button fx:id="removeEdgeDialogOK" mnemonicParsing="false" text="OK" />
+                <Button fx:id="removeEdgeDialogCancel" mnemonicParsing="false" text="Cancel" />
+            </buttons>
+        </ButtonBar>
+    </bottom>
+   <center>
+         <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0" BorderPane.alignment="CENTER">
+             <VBox fx:id="removeEdgeDialogBox" prefHeight="366.0" prefWidth="296.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                 <AnchorPane>
+                     <Label alignment="CENTER" prefHeight="17.0" prefWidth="296.0" text="All the edges : " AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+                 </AnchorPane>
+             </VBox>
+         </AnchorPane>
+   </center>
+</BorderPane>
