@@ -4,7 +4,10 @@ import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.GridPane;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
@@ -13,6 +16,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.*;
 
@@ -142,6 +146,41 @@ public class MainMenuController implements Initializable {
             }
         }
         return chosenFile;
+    }
+
+    private void displayPng() {
+        String tempName = "tmp_graf";
+        try {
+            PertGraf.getInstance().generateRender(tempName);
+        } catch (Exception e) {
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("Error !");
+            alert.setHeaderText(null);
+            if (e.getMessage().contains("Cannot run program")) {
+                alert.setContentText("Graphviz can't be located on your computer");
+            }
+            else {
+                alert.setContentText("Couldn't render the pert");
+            }
+            alert.showAndWait();
+            return;
+        }
+        Stage pngStage = new Stage();
+        pngStage.setTitle("render");
+        File file = new File("renders/" + tempName + ".png");
+        try {
+            String localUrl = file.toURI().toURL().toString();
+            Image image = new Image(localUrl);
+            ImageView imageView = new ImageView(image);
+            FlowPane root = new FlowPane();
+            root.getChildren().add(imageView);
+            Scene scene = new Scene(root, image.getWidth(), image.getHeight());
+            pngStage.setScene(scene);
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        }
+        file.delete();
+        pngStage.show();
     }
 
     private void initializeMenuListeners() {
@@ -369,7 +408,7 @@ public class MainMenuController implements Initializable {
             if (result.isPresent() && result.get() == buttonSave) {
                 PertGraf.setInstance((PertGraf) PertGraf.getInstance().getTransitiveClosure());
             } else if (result.isPresent() && result.get() == buttonPNG) {
-                //TODO print as png
+                displayPng();
             }
         });
 
