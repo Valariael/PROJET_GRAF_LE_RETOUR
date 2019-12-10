@@ -273,27 +273,7 @@ public class MainMenuController implements Initializable {
         });
 
         menuExportPng.setOnAction(event -> {
-            TextInputDialog dialog = new TextInputDialog();
-            dialog.setTitle("Export to PNG");
-            dialog.setHeaderText("Export the pert to a PNG file");
-            dialog.setContentText("Enter a name:");
-            Optional<String> result = dialog.showAndWait();
-            if (result.isPresent()) {
-                try {
-                    PertGraf.getInstance().generateRender(result.toString());
-                } catch (Exception e) {
-                    Alert alert = new Alert(Alert.AlertType.ERROR);
-                    alert.setTitle("Error !");
-                    alert.setHeaderText(null);
-                    if (e.getMessage().contains("Cannot run program")) {
-                        alert.setContentText("Graphviz can't be located on your computer");
-                    }
-                    else {
-                        alert.setContentText("Couldn't export to PNG");
-                    }
-                    alert.showAndWait();
-                }
-            }
+            //TODO
         });
 
         menuExportPert.setOnAction(event -> {
