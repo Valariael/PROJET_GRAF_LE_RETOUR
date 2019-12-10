@@ -1,7 +1,15 @@
 import java.io.*;
 import java.util.*;
 
-public class PertGraf extends Graf implements Cloneable {
+/**
+ * This class class allows creation and manipulation of a PERT graph represented as an adjacency list.
+ * It can be created empty or generated programmatically or from a file.
+ * A Singleton Pattern was implemented as there was no need to have multiple PERT instances.
+ * That way it can also be used easily throughout the project.
+ *
+ * @author Axel Ledermann, Augustin Bordy
+ */
+public class PertGraf extends Graf {
     private static final String PERT_START_NODE = "starting_node";
     private static final String PERT_END_NODE = "ending_node";
     private static final String DOT_SEPARATOR = "==";
@@ -10,25 +18,51 @@ public class PertGraf extends Graf implements Cloneable {
 
     private PertGraf() {}
 
+    /**
+     * Returns the current instance of PertGraf and creates it if null.
+     *
+     * @return the current instance of PertGraf
+     */
     static PertGraf getInstance() {
-        if (pertInstance == null)
-        {   pertInstance = new PertGraf();
+        if (pertInstance == null) {
+            pertInstance = new PertGraf();
         }
         return pertInstance;
     }
 
+    /**
+     * Returns an empty instance of PertGraf.
+     *
+     * @return a new instance of PertGraf
+     */
     private static PertGraf newInstance() {
         return new PertGraf();
     }
 
+    /**
+     * Resets the current instance of PertGraf to an empty one.
+     */
     static void resetInstance() {
         pertInstance = new PertGraf();
     }
 
+    /**
+     * Sets the current instance of PertGraf.
+     *
+     * @param p the instance of PertGraf to be used
+     */
     static void setInstance(PertGraf p) {
         pertInstance = p;
     }
 
+    /**
+     * Creates a PertGraf by reading the PERT formatted file 'path' .
+     *
+     * @param path the path to the selected file
+     * @return the corresponding PertGraf instance, null if error
+     * @throws FileNotFoundException if said file could not be found
+     * @throws InvalidFormatException if the data is not formatted as expected
+     */
     static PertGraf createFromPertFile(String path) throws FileNotFoundException, InvalidFormatException {
         Set<TaskRaw> tasks = new HashSet<>();
 
@@ -44,9 +78,18 @@ public class PertGraf extends Graf implements Cloneable {
             return null;
         }
 
-        return createPertGrafFromTaskRawList(tasks); // TODO : Pas fini >> AH!
+        return createPertGrafFromTaskRawList(tasks);
     }
 
+    /**
+     * Creates a PertGraf by reading the DOT formatted file 'path' .
+     * It buffers all the lines read in the file and passes them to 'createPertGrafFromDotString'.
+     *
+     * @param path the path to the selected file
+     * @return the corresponding PertGraf instance, null if error
+     * @throws FileNotFoundException if said file could not be found
+     * @throws IndexOutOfBoundsException if the data is not formatted as expected
+     */
     static PertGraf createFromDotFile(String path) throws FileNotFoundException, IndexOutOfBoundsException {
         StringBuilder sb = new StringBuilder();
 
@@ -63,9 +106,10 @@ public class PertGraf extends Graf implements Cloneable {
             return null;
         }
 
-        return createPertGrafFromDotString(sb.toString()); // TODO : Pas fini >> AH!
+        return createPertGrafFromDotString(sb.toString());
     }
 
+    //TODO
     static PertGraf createPertGrafFromPertString(String pertString) {
         String[] pertStringLines = pertString.split("\n");
         Set<TaskRaw> tasks = new HashSet<>();
@@ -82,6 +126,12 @@ public class PertGraf extends Graf implements Cloneable {
         return createPertGrafFromTaskRawList(tasks);
     }
 
+    /**
+     * Creates a PertGraf instance from a set of task data.
+     *
+     * @param tasks the set of TaskRaw objects
+     * @return a PertGraf instance containing the corresponding tasks
+     */
     private static PertGraf createPertGrafFromTaskRawList(Set<TaskRaw> tasks) {
         PertGraf pert = new PertGraf();
 
@@ -109,6 +159,13 @@ public class PertGraf extends Graf implements Cloneable {
         return pert;
     }
 
+    /**
+     * Creates a PertGraf instance from a text string of DOT formatted lines.
+     *
+     * @param dotString a text string of DOT formatted lines
+     * @return the corresponding PertGraf instance
+     * @throws IndexOutOfBoundsException if the data is not formatted as expected
+     */
     private static PertGraf createPertGrafFromDotString(String dotString) throws IndexOutOfBoundsException{
         PertGraf p = new PertGraf();
         String[] dotStringLines = dotString.split("\n");
@@ -149,6 +206,13 @@ public class PertGraf extends Graf implements Cloneable {
         return p;
     }
 
+    /**
+     * Creates a task data object from a line of characters in the PERT format.
+     *
+     * @param line the string of characters to be processed
+     * @return a TaskRaw object or null if necessary
+     * @throws InvalidFormatException if the data is not formatted as expected
+     */
     private static TaskRaw computePertLine(String line) throws InvalidFormatException
     {
         if (line.startsWith("#")) {
@@ -177,7 +241,12 @@ public class PertGraf extends Graf implements Cloneable {
     }
 
 
-    Map<Node, Integer> computeEarlyTimes() {
+    /**
+     * Computes the early start times of the current graph.
+     *
+     * @return a Map associating each task:Node to the start time:Integer
+     */
+    Map<Node, Integer> computeEarlyTimes() {//TODO not print start node
         Map<Node, Integer> distances = new HashMap<>();
         Task startingNode = new Task(PERT_START_NODE);
 
@@ -202,6 +271,12 @@ public class PertGraf extends Graf implements Cloneable {
         return distances;
     }
 
+    /**
+     * Computes the late start times of the current graph.
+     *
+     * @param endingTime the ending time of the early start time
+     * @return a Map associating each task:Node to the start time:Integer
+     */
     Map<Node, Integer> computeLateTimesFromEnd(int endingTime) {
         Map<Node, Integer> distances = new HashMap<>();
         Task startingNode = new Task(PERT_END_NODE);
@@ -227,6 +302,11 @@ public class PertGraf extends Graf implements Cloneable {
         return distances;
     }
 
+    /**
+     * Computes the reverse of the current graph.
+     *
+     * @return the reversed PertGraf instance
+     */
     PertGraf getReversePert() {
         PertGraf reverse = new PertGraf();
 
@@ -246,6 +326,13 @@ public class PertGraf extends Graf implements Cloneable {
         return reverse;
     }
 
+    /**
+     * @param paths
+     * @param currentPath
+     * @param earliestTimes
+     * @param latestTimes
+     * @param currentNode
+     *///TODO jdoc
     private void computeCriticalPathsRec(List<List<Node>> paths, List<Node> currentPath, Map<Node, Integer> earliestTimes, Map<Node, Integer> latestTimes, List<Node> currentNode) {
         boolean found = false;
 
@@ -265,6 +352,11 @@ public class PertGraf extends Graf implements Cloneable {
         }
     }
 
+    /**
+     * Computes a list of the critical paths in the PERT.
+     *
+     * @return the list of paths as task:Node lists
+     */
     List<List<Node>> computeCriticalPaths() {
         Task startingNode = addStartingTask(getStartingTasks());
         Task endingNode = addEndingTask(getEndingTasks());
@@ -287,6 +379,12 @@ public class PertGraf extends Graf implements Cloneable {
         return criticalsPaths;
     }
 
+    /**
+     * Adds a generic starting task to the PERT graph.
+     *
+     * @param children a list of tasks:Node that will depend on the starting task
+     * @return a reference to the Task added
+     */
     Task addStartingTask(ArrayList<Node> children) {
         Task start = new Task(PERT_START_NODE);
         start.setDuration(0);
@@ -302,6 +400,12 @@ public class PertGraf extends Graf implements Cloneable {
         return start;
     }
 
+    /**
+     * Adds a generic ending task to the PERT graph.
+     *
+     * @param parents a list of tasks:Node that will be the ending tasks' dependencies
+     * @return a reference to the Task added
+     */
     Task addEndingTask(ArrayList<Task> parents) {
         Task end = new Task(PERT_END_NODE);
 
@@ -319,6 +423,9 @@ public class PertGraf extends Graf implements Cloneable {
         return end;
     }
 
+    /**
+     * Removes the generic ending task from the current graph.
+     */
     void removeEndingTask() {
         Task end = new Task(PERT_END_NODE);
 
@@ -329,6 +436,11 @@ public class PertGraf extends Graf implements Cloneable {
         this.adjList.remove(end);
     }
 
+    /**
+     * Returns a list of all the starting tasks, meaning that they have no dependency.
+     *
+     * @return a list of task:Node
+     */
     ArrayList<Node> getStartingTasks() {
         ArrayList<Node> startingTasks = new ArrayList<>();
         HashSet<Node> known = new HashSet<>();
@@ -344,6 +456,11 @@ public class PertGraf extends Graf implements Cloneable {
         return startingTasks;
     }
 
+    /**
+     * Returns a list of all the ending tasks, meaning that they have no descendant.
+     *
+     * @return a list of task:Node
+     */
     ArrayList<Task> getEndingTasks() {
         ArrayList<Task> endingTasks = new ArrayList<>();
 
@@ -354,6 +471,13 @@ public class PertGraf extends Graf implements Cloneable {
         return endingTasks;
     }
 
+    /**
+     * Computes a scheduling of the tasks of the PERT following a given strategy.
+     *
+     * @param numberOfWorkers the number of workers to use in the scheduling
+     * @param schedulingStrategy the strategy to be used
+     * @return a list of tasks:Task to be executed in order from start to end
+     */
     List<Task> computeListScheduling(int numberOfWorkers, SchedulingStrategies schedulingStrategy) {
         ArrayList<Task> working = new ArrayList<>();
         HashSet<Task> done = new HashSet<>();
@@ -389,6 +513,13 @@ public class PertGraf extends Graf implements Cloneable {
         return scheduling;
     }
 
+    /**
+     * Gets the tasks available to unassigned workers.
+     *
+     * @param done the set of tasks already completed
+     * @param working the set of tasks being currently proceeded
+     * @return a set of tasks:Node waiting to be executed
+     */
     private Set<Node> getPendingTasks(HashSet<Task> done, ArrayList<Task> working) {
         HashSet<Node> availableTasks = new HashSet<>(this.adjList.keySet());
 
@@ -411,23 +542,37 @@ public class PertGraf extends Graf implements Cloneable {
 
     boolean checkPertIsTree(){return true;} //TODO implement ? or not ? or checkTaskValid
 
-    private Task getHighestPriorityTask(Set<Node> pending, SchedulingStrategies s) {
-        switch(s) {
+    /**
+     * Gets the task with the highest priority from the assignable tasks according to the strategy.
+     *
+     * @param pendingTasks the set of tasks available to unassigned workers
+     * @param selectedStrategy the selected SchedulingStrategies
+     * @return the Task with the highest priority
+     */
+    private Task getHighestPriorityTask(Set<Node> pendingTasks, SchedulingStrategies selectedStrategy) {
+        switch(selectedStrategy) {
             case LONGEST_PATH:
-                return highestPriorityTaskLongestPath(pending);
+                return highestPriorityTaskLongestPath(pendingTasks);
             case CRITICAL_PATH:
-                return highestPriorityTaskCriticalPath(pending);
+                return highestPriorityTaskCriticalPath(pendingTasks);
             case HEFT_ALGORITHM:
-                return highestPriorityTaskHEFT(pending);
+                return highestPriorityTaskHEFT(pendingTasks);
             case SHORTEST_PROCESSING_TIME:
-                return highestPriorityTaskSPT(pending);
+                return highestPriorityTaskSPT(pendingTasks);
             case LONGEST_PROCESSING_TIME:
-                return highestPriorityTaskLPT(pending);
+                return highestPriorityTaskLPT(pendingTasks);
         }
 
         return null;
     }
 
+    /**
+     * Gets the highest priority task from a set of tasks with the longest path algorithm.
+     * It is the one that has the highest finish time on its longest path.
+     *
+     * @param pending the set of tasks to be evaluated
+     * @return the Task with the highest priority
+     */
     private Task highestPriorityTaskLongestPath(Set<Node> pending) {
         Task startingNode = addStartingTask(getStartingTasks());
         addEndingTask(getEndingTasks());
@@ -457,8 +602,15 @@ public class PertGraf extends Graf implements Cloneable {
         return null;
     }
 
+    /**
+     * Gets the highest priority task from a set of tasks with an adaptation of the HEFT algorithm.
+     * It is based on the computation on late start times and the selected task is the one that has the highest late start time.
+     *
+     * @param pending the set of tasks to be evaluated
+     * @return the Task with the highest priority
+     */
     private Task highestPriorityTaskHEFT(Set<Node> pending) {
-        Task startingNode = addStartingTask(getStartingTasks()); //TODO keep starting node in pert ?
+        Task startingNode = addStartingTask(getStartingTasks()); //TODO option to add starting and end nodes in export
         addEndingTask(getEndingTasks());
 
         PertGraf reversed = getReversePert();
@@ -476,10 +628,16 @@ public class PertGraf extends Graf implements Cloneable {
         removeNode(startingNode);
         removeEndingTask();
 
-        System.out.println("here HEFT end");
         return (Task) latestEndNode;
     }
 
+    /**
+     * Gets the highest priority task from a set of tasks with the longest processing time method.
+     * It is the one that has the highest duration.
+     *
+     * @param pending the set of tasks to be evaluated
+     * @return the Task with the highest priority
+     */
     private Task highestPriorityTaskLPT(Set<Node> pending) {
         int longestProcTime = Integer.MIN_VALUE;
         Task longestProcTimeNode = null;
@@ -495,6 +653,13 @@ public class PertGraf extends Graf implements Cloneable {
         return longestProcTimeNode;
     }
 
+    /**
+     * Gets the highest priority task from a set of tasks with the shortest processing time method.
+     * It is the one that has the lowest duration.
+     *
+     * @param pending the set of tasks to be evaluated
+     * @return the Task with the highest priority
+     */
     private Task highestPriorityTaskSPT(Set<Node> pending) {
         int shortestProcTime = Integer.MAX_VALUE;
         Task shortestProcTimeNode = null;
@@ -510,6 +675,13 @@ public class PertGraf extends Graf implements Cloneable {
         return shortestProcTimeNode;
     }
 
+    /**
+     * Gets the highest priority task from a set of tasks with the critical path method.
+     * It is the one that has the highest duration and is on a critical path, or not on a critical path if there are none.
+     *
+     * @param pending the set of tasks to be evaluated
+     * @return the Task with the highest priority
+     */
     private Task highestPriorityTaskCriticalPath(Set<Node> pending) {
         PertGraf currentPert = PertGraf.getInstance();
         PertGraf newPert = PertGraf.newInstance();
@@ -544,6 +716,12 @@ public class PertGraf extends Graf implements Cloneable {
         return null;
     }
 
+    /**
+     * Computes a longest path from a designated node.
+     *
+     * @param startingNode the starting node fr the longest path
+     * @return a pair containing the path as a Deque of tasks:Node and its duration
+     */
     LongestPathInfo<Deque<Node>, Integer> computeLongestPathFrom(Node startingNode) { //TODO support multiple longest paths
         List<Edge> allEdges = this.getAllEdges();
         Map<Node, Integer> distances = new HashMap<>();
@@ -621,7 +799,7 @@ public class PertGraf extends Graf implements Cloneable {
      * @return The List of Node objects in the order of the DFS.
      */
     @Override
-    public List<Node> getDFS() { //TODO remove ?
+    public List<Node> getDFS() {
         Node startingNode = Collections.min(this.adjList.keySet(), Comparator.comparing(Node::hashCode));
 
         return getDFS(startingNode);
@@ -686,6 +864,11 @@ public class PertGraf extends Graf implements Cloneable {
         return sb.toString();
     }
 
+    /**
+     * Computes a string array representing the PERT graph as a successor array.
+     *
+     * @return the successor array as a string array
+     */
     String[] getPertSuccessorArray()
     {
         ArrayList<Node> nodes = new ArrayList<>(this.getAllNodes());
@@ -706,24 +889,11 @@ public class PertGraf extends Graf implements Cloneable {
         return array;
     }
 
-    @Override
-    public String toString() {
-        StringBuilder sb = new StringBuilder();
-        for(Map.Entry<Node, ArrayList<Node>> entry : adjList.entrySet()) {
-            boolean first = true;
-            sb.append(entry.getKey().getName()).append(" -> ");
-            for (Node nextTask : entry.getValue()) {
-                if (!first) {
-                    sb.append(", ");
-                }
-                sb.append(nextTask.getName());
-                first = false;
-            }
-            sb.append(System.getProperty("line.separator"));
-        }
-        return sb.toString();
-    }
-
+    /**
+     * Computes a string representation in the PERT format of the current graph, as an adjacency list.
+     *
+     * @return the adjacency list as a string
+     */
     String toPertString() {
         StringBuilder sb = new StringBuilder();
         for (Node node : getAllNodes()) {
@@ -742,16 +912,30 @@ public class PertGraf extends Graf implements Cloneable {
         return sb.toString();
     }
 
+    /**
+     * Saves the current graphs' representation in the PERT format to the file 'path'.
+     *
+     * @param path the path to the designated location
+     * @throws IOException if an error occurred while creating the file
+     */
     void toPertFile(String path) throws IOException {
         BufferedWriter writer = new BufferedWriter(new FileWriter(path));
         writer.write(this.toPertString());
         writer.close();
     }
 
+    /**
+     * Resets to 0 the amount of time worked on each task of the graph.
+     */
     private void resetWorkedTimes() {
         adjList.forEach((nodeFrom, nodeList) -> ((Task) nodeFrom).resetWorkedTimes());
     }
 
+    /**
+     * Removes all the ancestors of the nodes in 'pending'.
+     *
+     * @param pending the set of designated tasks:Node
+     */
     private void removeAncestors(Set<Node> pending) {
         for(Node n : pending) {
             List<Edge> inEdges = getInEdges(n);
@@ -766,5 +950,23 @@ public class PertGraf extends Graf implements Cloneable {
                 removeNode(a);
             }
         }
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        for(Map.Entry<Node, ArrayList<Node>> entry : adjList.entrySet()) {
+            boolean first = true;
+            sb.append(entry.getKey().getName()).append(" -> ");
+            for (Node nextTask : entry.getValue()) {
+                if (!first) {
+                    sb.append(", ");
+                }
+                sb.append(nextTask.getName());
+                first = false;
+            }
+            sb.append(System.getProperty("line.separator"));
+        }
+        return sb.toString();
     }
 }

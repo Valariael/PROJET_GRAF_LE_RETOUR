@@ -17,11 +17,7 @@
             <Menu mnemonicParsing="false" text="Export">
                 <MenuItem fx:id="menuExportDot" mnemonicParsing="false" text="To DOT file" />
                 <MenuItem fx:id="menuExportPert" mnemonicParsing="false" text="To PERT file" />
-                <MenuItem fx:id="menuExportPng" mnemonicParsing="false" text="To PDF file" />
-            </Menu>
-            <Menu mnemonicParsing="false" text="Generate">
-                <MenuItem fx:id="menuRandomDirectedGraph" mnemonicParsing="false" text="Random directed graph" />
-                <MenuItem fx:id="menuRandomDAG" mnemonicParsing="false" text="Random DAG" />
+                <MenuItem fx:id="menuExportPng" mnemonicParsing="false" text="To PNG file" />
             </Menu>
             <Menu mnemonicParsing="false" text="Compute">
                 <MenuItem fx:id="menuBFS" mnemonicParsing="false" text="Breadth-FIrst-Search" />

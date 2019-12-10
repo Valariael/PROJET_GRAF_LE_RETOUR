@@ -55,8 +55,6 @@ public class MainMenuController implements Initializable {
             menuExportDot,
             menuExportPng,
             menuExportPert,
-            menuRandomDirectedGraph,
-            menuRandomDAG,
             menuBFS,
             menuDFS,
             menuTransitiveClosure,
@@ -151,10 +149,12 @@ public class MainMenuController implements Initializable {
 
     private void displayPng() {
         String tempName = "tmp_graf";
+
         try {
             PertGraf.getInstance().generateRender(tempName);
         } catch (Exception e) {
             Alert alert = new Alert(Alert.AlertType.ERROR);
+
             alert.setTitle("Error !");
             alert.setHeaderText(null);
             if (e.getMessage().contains("Cannot run program")) {
@@ -164,11 +164,14 @@ public class MainMenuController implements Initializable {
                 alert.setContentText("Couldn't render the pert");
             }
             alert.showAndWait();
+
             return;
         }
+
         Stage pngStage = new Stage();
         pngStage.setTitle("render");
         File file = new File("renders/" + tempName + ".png");
+
         try {
             String localUrl = file.toURI().toURL().toString();
             Image image = new Image(localUrl);
@@ -180,6 +183,7 @@ public class MainMenuController implements Initializable {
         } catch (MalformedURLException e) {
             e.printStackTrace();
         }
+
         file.delete();
         pngStage.show();
     }
@@ -191,10 +195,9 @@ public class MainMenuController implements Initializable {
             FileChooser fileChooser = new FileChooser();
             fileChooser.setTitle("Load from DOT file");
             File chosenFile = chooseLocation(fileChooser, false);
-            //TODO error handling
+
             try {
-                try
-                {
+                try {
                     PertGraf.setInstance(PertGraf.createFromDotFile(chosenFile.getPath()));
                     displayGraf();
                 } catch(IndexOutOfBoundsException e) {
@@ -223,7 +226,7 @@ public class MainMenuController implements Initializable {
             FileChooser fileChooser = new FileChooser();
             fileChooser.setTitle("Load from PERT file");
             File chosenFile = chooseLocation(fileChooser, false);
-            //TODO error handling
+
             try {
                 PertGraf.setInstance(PertGraf.createFromPertFile(chosenFile.getPath()));
                 displayGraf();
@@ -355,14 +358,6 @@ public class MainMenuController implements Initializable {
                     e.printStackTrace();
                 }
             }
-        });
-
-        menuRandomDirectedGraph.setOnAction(event -> {
-            //TODO
-        });
-
-        menuRandomDAG.setOnAction(event -> {
-            //TODO
         });
 
         menuBFS.setOnAction(event -> {
@@ -542,7 +537,7 @@ public class MainMenuController implements Initializable {
                     alert.setContentText(sb.toString());
 
                     alert.showAndWait();
-                }); //TODO fix blocking LPT + SPT + HEFT when not in debug !!!!
+                });
             });
         });
     }
@@ -558,9 +553,7 @@ public class MainMenuController implements Initializable {
             displayGraf();
         });
 
-        displayRenderFormat.setOnAction(event -> {
-            displayPng();
-        });
+        displayRenderFormat.setOnAction(event -> displayPng());
 
         displayAdjacendyList.setOnAction(event -> {
             computeChangesAndSwitch(DisplayType.ADJACENCY_LIST);

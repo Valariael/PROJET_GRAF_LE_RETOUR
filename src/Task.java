@@ -1,6 +1,6 @@
 public class Task extends Node {
     private String label;
-    private int duration;//TODO implement
+    private int duration;
     private int workedTimes;
 
     Task(String name) {
@@ -8,7 +8,7 @@ public class Task extends Node {
         this.setToLabel(0);
     }
 
-    Task(String name, String label) {
+    Task(String name, String label) {//TODO remove unused
         super(name);
         this.label = label;
         this.setToLabel(0);

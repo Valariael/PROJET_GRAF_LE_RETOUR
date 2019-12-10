@@ -26,12 +26,10 @@ public class UserInterface extends Application
         BorderPane rootLayout = fxmlLoader.load(fxmlStream);
         MainMenuController controller = fxmlLoader.getController();
         controller.setObserver(this);
+
         Scene scene = new Scene(rootLayout);
         primaryStage.setTitle("PERT Editor");
         primaryStage.setScene(scene);
         primaryStage.show();
     }
-
-    @Override
-    public void stop() {}
 }
