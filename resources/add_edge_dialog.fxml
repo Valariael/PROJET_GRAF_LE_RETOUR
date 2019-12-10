@@ -1,31 +1,29 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.geometry.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-
-<BorderPane fx:controller="AddEdgeDialogController" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity"
-            minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/10.0.2-internal"
-            xmlns:fx="http://javafx.com/fxml/1">
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/10.0.2-internal" xmlns:fx="http://javafx.com/fxml/1" fx:controller="AddEdgeDialogController">
     <center>
         <SplitPane dividerPositions="0.5" prefHeight="160.0" prefWidth="200.0" BorderPane.alignment="CENTER">
             <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0">
-                <VBox fx:id="addEdgeDialogFromBox" prefHeight="366.0" prefWidth="296.0" AnchorPane.bottomAnchor="0.0"
-                      AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                <VBox fx:id="addEdgeDialogFromBox" prefHeight="366.0" prefWidth="296.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                     <AnchorPane>
-                        <Label alignment="CENTER" prefHeight="17.0" prefWidth="296.0" text="From : "
-                               AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0"
-                               AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0"/>
+                        <Label alignment="CENTER" prefHeight="17.0" prefWidth="296.0" text="From : " AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                     <padding>
+                        <Insets top="10.0" />
+                     </padding></Label>
                     </AnchorPane>
                 </VBox>
             </AnchorPane>
             <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0">
-                <VBox fx:id="addEdgeDialogToBox" prefHeight="366.0" prefWidth="296.0" AnchorPane.bottomAnchor="0.0"
-                      AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                <VBox fx:id="addEdgeDialogToBox" prefHeight="366.0" prefWidth="296.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                     <AnchorPane>
-                        <Label alignment="CENTER" prefHeight="17.0" prefWidth="296.0" text="To : "
-                               AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0"
-                               AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0"/>
+                        <Label alignment="CENTER" prefHeight="17.0" prefWidth="296.0" text="To : " AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                     <padding>
+                        <Insets top="10.0" />
+                     </padding></Label>
                     </AnchorPane>
                 </VBox>
             </AnchorPane>
@@ -34,8 +32,8 @@
     <bottom>
         <ButtonBar prefHeight="32.0" prefWidth="600.0" BorderPane.alignment="CENTER">
             <buttons>
-                <Button fx:id="addEdgeDialogOK" mnemonicParsing="false" text="OK"/>
-                <Button fx:id="addEdgeDialogCancel" mnemonicParsing="false" text="Cancel"/>
+                <Button fx:id="addEdgeDialogOK" mnemonicParsing="false" text="OK" />
+                <Button fx:id="addEdgeDialogCancel" mnemonicParsing="false" text="Cancel" />
             </buttons>
         </ButtonBar>
     </bottom>
