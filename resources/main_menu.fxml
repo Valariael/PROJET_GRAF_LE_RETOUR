@@ -63,6 +63,16 @@
                         <VBox.margin>
                             <Insets bottom="5.0" left="10.0" right="10.0" top="5.0" />
                         </VBox.margin>
+                        <Button fx:id="displayRenderFormat" mnemonicParsing="false" prefHeight="20.0" prefWidth="190.0" text="Render format" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                            <font>
+                                <Font name="Consolas Bold" size="13.0" />
+                            </font>
+                        </Button>
+                    </AnchorPane>
+                    <AnchorPane prefHeight="20.0" prefWidth="200.0">
+                        <VBox.margin>
+                            <Insets bottom="5.0" left="10.0" right="10.0" top="5.0" />
+                        </VBox.margin>
                         <Button fx:id="displayAdjacendyList" mnemonicParsing="false" prefHeight="30.0" prefWidth="193.0" text="Adjacency list" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                             <font>
                                 <Font name="Consolas Bold" size="13.0" />

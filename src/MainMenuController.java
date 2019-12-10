@@ -40,6 +40,7 @@ public class MainMenuController implements Initializable {
             displayAdjacencyMatrix,
             displaySuccessorArray,
             displayReverseGraph,
+            displayRenderFormat,
             featureAddNode,
             featureAddEdge,
             featureRemoveNode,
@@ -555,6 +556,10 @@ public class MainMenuController implements Initializable {
         displayDotFormat.setOnAction(event -> {
             computeChangesAndSwitch(DisplayType.DOT_FORMAT);
             displayGraf();
+        });
+
+        displayRenderFormat.setOnAction(event -> {
+            displayPng();
         });
 
         displayAdjacendyList.setOnAction(event -> {
