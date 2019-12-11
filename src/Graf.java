@@ -64,16 +64,6 @@ public class Graf {
     }
 
     /**
-     * Adds a new vertex to the graph, created from the int parameter.
-     *
-     * @param n The 'int' value to be used to create a new vertex.
-     */
-    public void addNode(int n) {
-        Node node = new Node(n);
-        adjList.put(node, new ArrayList<>());
-    } // TODO remove ? or overload every method
-
-    /**
      * Removes the vertex in parameter from the graph.
      *
      * @param node The Node object to be removed.
@@ -83,11 +73,8 @@ public class Graf {
 
         //removing all incident edges
         for (Map.Entry<Node, ArrayList<Node>> entry : this.adjList.entrySet()) {
-            Node nodeFrom = entry.getKey();
             ArrayList<Node> nodeList = entry.getValue();
-            for (Node nodeTo : nodeList) {
-                if (nodeTo.equals(node)) nodeList.remove(nodeTo);
-            }
+            nodeList.removeIf(nodeTo -> nodeTo.equals(node));
         }
     }
 

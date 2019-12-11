@@ -597,7 +597,7 @@ public class PertGraf extends Graf {
      * @return the Task with the highest priority
      */
     private Task highestPriorityTaskHEFT(Set<Node> pending) {
-        Task startingNode = addStartingTask(getStartingTasks()); //TODO option to add starting and end nodes in export
+        Task startingNode = addStartingTask(getStartingTasks());
         addEndingTask(getEndingTasks());
 
         PertGraf reversed = getReversePert();
@@ -709,7 +709,7 @@ public class PertGraf extends Graf {
      * @param startingNode the starting node fr the longest path
      * @return a pair containing the path as a Deque of tasks:Node and its duration
      */
-    LongestPathInfo<Deque<Node>, Integer> computeLongestPathFrom(Node startingNode) { //TODO support multiple longest paths
+    LongestPathInfo<Deque<Node>, Integer> computeLongestPathFrom(Node startingNode) {
         List<Edge> allEdges = this.getAllEdges();
         Map<Node, Integer> distances = new HashMap<>();
         Map<Node, Node> predecessors = new HashMap<>();

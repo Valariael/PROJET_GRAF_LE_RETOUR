@@ -1,7 +1,7 @@
 public class Edge implements Comparable<Edge> {
 
     private int weight;
-    private String label; //TODO: remove ?
+    private String label;
     private Node head, tail;
 
     public int getWeight() {
