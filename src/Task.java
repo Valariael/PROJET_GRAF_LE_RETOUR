@@ -29,6 +29,10 @@ public class Task extends Node {
         return label;
     }
 
+    void setLabel(String label) {
+        this.label = label;
+    }
+
     int getDuration() {
         return duration;
     }

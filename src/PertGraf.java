@@ -1040,4 +1040,22 @@ public class PertGraf extends Graf {
         }
         return sb.toString();
     }
+
+    void updateTasks(Task selectedNode, Task taskUpdated) {
+        this.adjList.forEach((nodeFrom, nodeList) -> {
+            if(nodeFrom.equals(selectedNode)) {
+                nodeFrom.setName(taskUpdated.getName());
+                ((Task) nodeFrom).setDuration(taskUpdated.getDuration());
+                ((Task) nodeFrom).setLabel(taskUpdated.getLabel());
+            }
+
+            nodeList.forEach(nodeTo -> {
+                if(nodeFrom.equals(selectedNode)) {
+                    nodeFrom.setName(taskUpdated.getName());
+                    ((Task) nodeFrom).setDuration(taskUpdated.getDuration());
+                    ((Task) nodeFrom).setLabel(taskUpdated.getLabel());
+                }
+            });
+        });
+    }
 }
