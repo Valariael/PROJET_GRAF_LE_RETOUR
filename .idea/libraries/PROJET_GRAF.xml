@@ -1,8 +1,6 @@
 <component name="libraryTable">
   <library name="PROJET_GRAF">
-    <CLASSES>
-      <root url="jar://$PROJECT_DIR$/PROJET_GRAF.jar!/" />
-    </CLASSES>
+    <CLASSES />
     <JAVADOC />
     <SOURCES />
   </library>
