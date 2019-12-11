@@ -82,9 +82,13 @@ public class Graf {
         adjList.remove(node);
 
         //removing all incident edges
-        this.adjList.forEach((nodeFrom, nodeList) -> nodeList.forEach((nodeTo) -> {
-            if(nodeTo.equals(node)) nodeList.remove(nodeTo);
-        }));
+        for (Map.Entry<Node, ArrayList<Node>> entry : this.adjList.entrySet()) {
+            Node nodeFrom = entry.getKey();
+            ArrayList<Node> nodeList = entry.getValue();
+            for (Node nodeTo : nodeList) {
+                if (nodeTo.equals(node)) nodeList.remove(nodeTo);
+            }
+        }
     }
 
     /**
