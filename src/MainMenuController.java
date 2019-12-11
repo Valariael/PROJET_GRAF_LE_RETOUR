@@ -322,7 +322,7 @@ public class MainMenuController implements Initializable {
 
             if (file != null) {
                 try {
-                    PertGraf.getInstance().toDotFile(file.getPath());
+                    PertGraf.getInstance().toDotFileData(file.getPath());
                 } catch (IOException e) {
                     e.printStackTrace();
                     Alert alert = new Alert(Alert.AlertType.ERROR);
@@ -651,6 +651,7 @@ public class MainMenuController implements Initializable {
 
             Optional<NewNodeInfos> result = dialog.showAndWait();
             result.ifPresent(content -> PertGraf.getInstance().addNode(new Task(content.name, content.label, content.duration)));
+            displayGraf();
         });
 
         featureAddEdge.setOnAction(event -> {

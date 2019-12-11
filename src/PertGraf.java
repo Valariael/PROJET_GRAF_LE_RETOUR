@@ -850,7 +850,7 @@ public class PertGraf extends Graf {
      * @param to The ending node we're searching for.
      * @return <code>true</code> if a path was found, <code>false</code> if not.
      */
-    public boolean pathExists(Node from, Node to) {
+    boolean pathExists(Node from, Node to) {
         Set<Node> covered = new HashSet<>();
         return pathExistsRec(from, to, covered);
     }
@@ -858,10 +858,10 @@ public class PertGraf extends Graf {
     /**
      * Computes the representation of the graph in the DOT formalism.
      *
+     * @param isRender 'true' to write DOT supported by Graphviz render, 'false' otherwise
      * @return The String object containing the DOT representation of the graph.
      */
-    @Override
-    public String toDotString() {
+    private String toDotString(boolean isRender) {
         StringBuilder sb = new StringBuilder();
 
         List<Node> lonelyNodes = getAllNodes();
@@ -878,18 +878,20 @@ public class PertGraf extends Graf {
             sb.append(" -> ");
             sb.append(nodeTo.getName());
 
-            if(nodeTo.isToWeightActivated()) {
-                sb.append(" [label=");
-                sb.append(((Task) nodeFrom).getDuration());
-                sb.append(DOT_SEPARATOR);
-                sb.append(((Task) nodeFrom).getLabel());
-                sb.append(DOT_SEPARATOR);
-                sb.append(((Task) nodeTo).getDuration());
-                sb.append(DOT_SEPARATOR);
-                sb.append(((Task) nodeTo).getLabel());
-                sb.append(DOT_SEPARATOR);
-                sb.append(nodeTo.getToLabel());
-                sb.append("]");
+            if(!isRender) {
+                if (nodeTo.isToWeightActivated()) {
+                    sb.append(" [label=");
+                    sb.append(((Task) nodeFrom).getDuration());
+                    sb.append(DOT_SEPARATOR);
+                    sb.append(((Task) nodeFrom).getLabel());
+                    sb.append(DOT_SEPARATOR);
+                    sb.append(((Task) nodeTo).getDuration());
+                    sb.append(DOT_SEPARATOR);
+                    sb.append(((Task) nodeTo).getLabel());
+                    sb.append(DOT_SEPARATOR);
+                    sb.append(nodeTo.getToLabel());
+                    sb.append("]");
+                }
             }
 
             sb.append(";\n");
@@ -988,6 +990,31 @@ public class PertGraf extends Graf {
                 removeNode(a);
             }
         }
+    }
+
+    /**
+     * Writes the representation in the DOT formalism of the graph to a file, with extra data for the tasks.
+     *
+     * @param path The path to the target file.
+     * @throws IOException In case of error when trying to open the file or to write on it.
+     */
+    void toDotFileData(String path) throws IOException {
+        BufferedWriter writer = new BufferedWriter(new FileWriter(path));
+        writer.write(toDotString(false));
+        writer.close();
+    }
+
+    /**
+     * Writes the representation in the DOT formalism of the graph to a file.
+     *
+     * @param path The path to the target file.
+     * @throws IOException In case of error when trying to open the file or to write on it.
+     */
+    @Override
+    public void toDotFile(String path) throws IOException {
+        BufferedWriter writer = new BufferedWriter(new FileWriter(path));
+        writer.write(toDotString(true));
+        writer.close();
     }
 
     @Override
