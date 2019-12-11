@@ -97,7 +97,7 @@ public class MainMenuController implements Initializable {
                 textAreaDisplayGraph.setText(PertGraf.getInstance().toPertString());
                 break;
             case DOT_FORMAT:
-                textAreaDisplayGraph.setText(PertGraf.getInstance().toDotString(true));
+                textAreaDisplayGraph.setText(PertGraf.getInstance().toDotString(false));
                 break;
             case ADJACENCY_LIST:
                 textAreaDisplayGraph.setText(PertGraf.getInstance().toString());
