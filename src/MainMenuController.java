@@ -449,7 +449,13 @@ public class MainMenuController implements Initializable {
             alert.setTitle("Computed result");
             alert.setHeaderText("Early times result : ");
             StringBuilder sb = new StringBuilder();
+
+
+            Task startingNode = PertGraf.getInstance().addStartingTask(PertGraf.getInstance().getStartingTasks());
+            PertGraf.getInstance().addEndingTask(PertGraf.getInstance().getEndingTasks());
             Map<Node, Integer> times = PertGraf.getInstance().computeEarlyTimes();
+            PertGraf.getInstance().removeNode(startingNode);
+            PertGraf.getInstance().removeEndingTask();
 
             for (Map.Entry<Node, Integer> entry : times.entrySet()) {
                 sb.append(entry.getKey().toString());
