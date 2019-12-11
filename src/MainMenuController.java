@@ -50,6 +50,7 @@ public class MainMenuController implements Initializable {
             featureAddNode,
             featureAddEdge,
             featureRemoveNode,
+            featureEditNode,
             featureRemoveEdge;
     @FXML
     TextArea textAreaDisplayGraph;
@@ -599,22 +600,10 @@ public class MainMenuController implements Initializable {
             displayGraf();
         });
 
-        class NewNodeInfos {
-            private String name;
-            private String label;
-            private int duration;
-
-            private NewNodeInfos(String name, String label, int duration) {
-                this.name = name;
-                this.label = label;
-                this.duration = duration;
-            }
-        }
-
         featureAddNode.setOnAction(event -> {
             Dialog<NewNodeInfos> dialog = new Dialog<>();
             dialog.setTitle("Add a Node");
-            dialog.setHeaderText("Please, fill the nodes informations");
+            dialog.setHeaderText("Please, fill the nodes information");
 
             ButtonType confirmButtonType = new ButtonType("Ok", ButtonBar.ButtonData.OK_DONE);
             dialog.getDialogPane().getButtonTypes().addAll(confirmButtonType, ButtonType.CANCEL);
@@ -682,6 +671,25 @@ public class MainMenuController implements Initializable {
                 Scene scene = new Scene(rootLayout);
                 Stage stage = new Stage();
                 stage.setTitle("Removing an edge");
+                stage.setScene(scene);
+                stage.show();
+                controller.setObserver(stage);
+                controller.setOriginController(this);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        });
+
+        featureEditNode.setOnAction(event -> {
+            final FXMLLoader fxmlLoader = new FXMLLoader();
+            FileInputStream fxmlStream;
+            try {
+                fxmlStream = new FileInputStream("resources/edit_node_dialog.fxml");
+                BorderPane rootLayout = fxmlLoader.load(fxmlStream);
+                EditNodeDialogController controller = fxmlLoader.getController();
+                Scene scene = new Scene(rootLayout);
+                Stage stage = new Stage();
+                stage.setTitle("Editing a node");
                 stage.setScene(scene);
                 stage.show();
                 controller.setObserver(stage);
