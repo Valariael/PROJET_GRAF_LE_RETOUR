@@ -892,6 +892,12 @@ public class PertGraf extends Graf {
                     sb.append(nodeTo.getToLabel());
                     sb.append("]");
                 }
+            } else {
+                if (nodeTo.isToWeightActivated()) {
+                    sb.append(" [label=\"");
+                    sb.append(((Task) nodeFrom).getLabel());
+                    sb.append("\"]");
+                }
             }
 
             sb.append(";\n");
