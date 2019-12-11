@@ -190,6 +190,7 @@ public class MainMenuController implements Initializable {
         Stage pngStage = new Stage();
         pngStage.setTitle("render");
         File file = new File("renders/" + tempName + ".png");
+        //file.delete();
 
         try {
             String localUrl = file.toURI().toURL().toString();
@@ -202,8 +203,6 @@ public class MainMenuController implements Initializable {
         } catch (MalformedURLException e) {
             e.printStackTrace();
         }
-
-        file.delete();
         pngStage.show();
     }
 

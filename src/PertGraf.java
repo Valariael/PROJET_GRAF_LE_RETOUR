@@ -184,7 +184,7 @@ public class PertGraf extends Graf {
                     start = 1;
                 }
 
-                String labelString = parts[start + 3].substring(7, parts[start + 3].length() - 2);
+                String labelString = parts[start + 3].substring(8, parts[start + 3].length() - 3);
                 String[] labelStringParts = labelString.split(DOT_SEPARATOR);
                 Task from = new Task(parts[start], labelStringParts[1], Integer.parseInt(labelStringParts[0]));
                 Task to;
@@ -327,12 +327,14 @@ public class PertGraf extends Graf {
     }
 
     /**
-     * @param paths
-     * @param currentPath
-     * @param earliestTimes
-     * @param latestTimes
-     * @param currentNode
-     *///TODO jdoc
+     * Recursivly search and collect critical paths int the graph.
+     *
+     * @param paths The critical paths that currently were found.
+     * @param currentPath The actual followed path.
+     * @param earliestTimes A map containing the earliest times of each node.
+     * @param latestTimes A map containing the latest times of each node.
+     * @param currentNode A list containing the next destinations of the current node.
+     */
     private void computeCriticalPathsRec(List<List<Node>> paths, List<Node> currentPath, Map<Node, Integer> earliestTimes, Map<Node, Integer> latestTimes, List<Node> currentNode) {
         boolean found = false;
 
@@ -868,19 +870,23 @@ public class PertGraf extends Graf {
 
         sb.append("digraph g {\n");
 
+        Set<Node> criticalNodes = new HashSet<>();
+        for (List<Node> criticalPath : computeCriticalPaths()) {
+            criticalNodes.addAll(criticalPath);
+        }
+
         this.adjList.forEach((nodeFrom, nodeList) -> nodeList.forEach((nodeTo -> {
             lonelyNodes.remove(nodeFrom);
             lonelyNodes.remove(nodeTo);
 
             sb.append(" ");
 
-            sb.append(nodeFrom.getName());
-            sb.append(" -> ");
-            sb.append(nodeTo.getName());
-
             if(!isRender) {
+                sb.append(nodeFrom.getName());
+                sb.append(" -> ");
+                sb.append(nodeTo.getName());
                 if (nodeTo.isToWeightActivated()) {
-                    sb.append(" [label=");
+                    sb.append(" [label=\"");
                     sb.append(((Task) nodeFrom).getDuration());
                     sb.append(DOT_SEPARATOR);
                     sb.append(((Task) nodeFrom).getLabel());
@@ -890,13 +896,25 @@ public class PertGraf extends Graf {
                     sb.append(((Task) nodeTo).getLabel());
                     sb.append(DOT_SEPARATOR);
                     sb.append(nodeTo.getToLabel());
-                    sb.append("]");
+                    sb.append("\"]");
                 }
             } else {
+                sb.append("\"").append(((Task)nodeFrom).getLabel()).append("\"");
+                sb.append(" -> ");
+                sb.append("\"").append(((Task)nodeTo).getLabel()).append("\"");
                 if (nodeTo.isToWeightActivated()) {
                     sb.append(" [label=\"");
-                    sb.append(((Task) nodeFrom).getLabel());
-                    sb.append("\"]");
+                    sb.append(((Task) nodeFrom).getDuration());
+                    sb.append("\"");
+                    if (criticalNodes.contains(nodeFrom) && criticalNodes.contains(nodeTo)) {
+                        sb.append(", color=red");
+                    }
+                    sb.append("]");
+                }
+                else {
+                    if (criticalNodes.contains(nodeFrom) && criticalNodes.contains(nodeTo)) {
+                        sb.append(" [color=red]");
+                    }
                 }
             }
 
