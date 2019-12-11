@@ -12,7 +12,7 @@ import java.util.Optional;
 import java.util.ResourceBundle;
 
 /**
- * Controller class for the Edit Node interface 'edit_node_dialog.xml.
+ * Controller class for the Edit Node interface in 'edit_node_dialog.xml'.
  */
 public class EditNodeDialogController implements Initializable {
     private Stage stage;
@@ -55,7 +55,7 @@ public class EditNodeDialogController implements Initializable {
 
         editNodeDialogOK.setOnAction(event -> {
             if(selectedTask != null) {
-                Dialog<NewNodeInfos> dialog = new Dialog<>();
+                Dialog<TaskRaw> dialog = new Dialog<>();
                 dialog.setTitle("Edit a Node");
                 dialog.setHeaderText("Please, edit the nodes information");
 
@@ -87,15 +87,15 @@ public class EditNodeDialogController implements Initializable {
 
                 dialog.setResultConverter(dialogButton -> {
                     if (dialogButton == confirmButtonType) {
-                        return new NewNodeInfos(nodeName.getText(), nodeLabel.getText(), nodeDuration.getValue());
+                        return new TaskRaw(nodeName.getText(), nodeLabel.getText(), nodeDuration.getValue());
                     }
                     return null;
                 });
 
 
-                Optional<NewNodeInfos> result = dialog.showAndWait();
+                Optional<TaskRaw> result = dialog.showAndWait();
                 result.ifPresent(content -> {
-                    Task taskUpdated = new Task(result.get().name, result.get().label, result.get().duration, result.get().duration);
+                    Task taskUpdated = new Task(result.get().getName(), result.get().getLabel(), result.get().getWeight(), result.get().getWeight());
                     PertGraf.getInstance().updateTasks(selectedTask, taskUpdated);
                     mainController.displayGraf();
                     stage.close();

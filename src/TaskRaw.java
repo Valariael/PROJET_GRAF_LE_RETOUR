@@ -9,6 +9,12 @@ class TaskRaw {
     private int weight;
     private Set<String> dependencies;
 
+    TaskRaw(String name, String label, int weight) {
+        this.name = name;
+        this.label = label;
+        this.weight = weight;
+    }
+
     TaskRaw(String name, String label, int weight, Set<String> dependencies) {
         this.name = name;
         this.label = label;

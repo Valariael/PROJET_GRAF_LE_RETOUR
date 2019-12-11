@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.ResourceBundle;
 
 /**
- * Controller class for the Add Edge interface 'add_edge_dialog.xml.
+ * Controller class for the Add Edge interface in 'add_edge_dialog.xml'.
  */
 public class AddEdgeDialogController implements Initializable {
     private Stage stage;

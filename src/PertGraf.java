@@ -109,23 +109,6 @@ public class PertGraf extends Graf {
         return createPertGrafFromDotString(sb.toString());
     }
 
-    //TODO
-    static PertGraf createPertGrafFromPertString(String pertString) {
-        String[] pertStringLines = pertString.split("\n");
-        Set<TaskRaw> tasks = new HashSet<>();
-
-        try {
-            for (String pertStringLine : pertStringLines) {
-                tasks.add(computePertLine(pertStringLine));
-            }
-        } catch (InvalidFormatException e) {
-            e.printStackTrace();
-            return null;
-        }
-
-        return createPertGrafFromTaskRawList(tasks);
-    }
-
     /**
      * Creates a PertGraf instance from a set of task data.
      *

@@ -1,10 +1,9 @@
+/**
+ * Class used to represent PERT graph edges e.g. dependencies.
+ */
 public class PertEdge extends Edge {
     PertEdge(Node head, Node tail, int weight) {
         super(head, tail, weight);
-    }
-
-    PertEdge(Node head, Node tail) {
-        super(head, tail, 0);
     }
 
     @Override
