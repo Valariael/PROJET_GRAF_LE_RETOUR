@@ -246,7 +246,7 @@ public class PertGraf extends Graf {
      *
      * @return a Map associating each task:Node to the start time:Integer
      */
-    Map<Node, Integer> computeEarlyTimes() {//TODO not print start node
+    Map<Node, Integer> computeEarlyTimes() {
         Map<Node, Integer> distances = new HashMap<>();
         Task startingNode = new Task(PERT_START_NODE);
 
@@ -267,6 +267,8 @@ public class PertGraf extends Graf {
                 }
             }
         }
+
+        distances.remove(startingNode);
 
         return distances;
     }
@@ -298,6 +300,8 @@ public class PertGraf extends Graf {
                 }
             }
         }
+
+        distances.remove(startingNode);
 
         return distances;
     }
@@ -541,8 +545,6 @@ public class PertGraf extends Graf {
 
         return availableTasks;
     }
-
-    boolean checkPertIsTree(){return true;} //TODO implement ? or not ? or checkTaskValid
 
     /**
      * Gets the task with the highest priority from the assignable tasks according to the strategy.
@@ -863,7 +865,7 @@ public class PertGraf extends Graf {
      * @param isRender 'true' to write DOT supported by Graphviz render, 'false' otherwise
      * @return The String object containing the DOT representation of the graph.
      */
-    private String toDotString(boolean isRender) {
+    String toDotString(boolean isRender) {
         StringBuilder sb = new StringBuilder();
 
         List<Node> lonelyNodes = getAllNodes();

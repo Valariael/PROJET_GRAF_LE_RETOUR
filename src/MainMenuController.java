@@ -111,7 +111,7 @@ public class MainMenuController implements Initializable {
                 textAreaDisplayGraph.setText(PertGraf.getInstance().toPertString());
                 break;
             case DOT_FORMAT:
-                textAreaDisplayGraph.setText(PertGraf.getInstance().toDotString());
+                textAreaDisplayGraph.setText(PertGraf.getInstance().toDotString(true));
                 break;
             case ADJACENCY_LIST:
                 textAreaDisplayGraph.setText(PertGraf.getInstance().toString());
@@ -396,7 +396,7 @@ public class MainMenuController implements Initializable {
             alert.showAndWait();
         });
 
-        menuDFS.setOnAction(event -> {//TODO: pick starting node ?
+        menuDFS.setOnAction(event -> {
             Alert alert = new Alert(Alert.AlertType.INFORMATION);
             alert.setTitle("Computed result");
             alert.setHeaderText("Depth-First-Search result : ");
@@ -425,6 +425,7 @@ public class MainMenuController implements Initializable {
             Optional<ButtonType> result = alert.showAndWait();
             if (result.isPresent() && result.get() == buttonSave) {
                 PertGraf.setInstance((PertGraf) PertGraf.getInstance().getTransitiveClosure());
+                displayGraf();
             } else if (result.isPresent() && result.get() == buttonPNG) {
                 displayPng();
             }
