@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.ResourceBundle;
 
 /**
- * Controller class for the Remove Edge interface 'remove_edge_dialog.xml'.
+ * Controller class for the Remove Edge interface in 'remove_edge_dialog.xml'.
  */
 public class RemoveEdgeDialogController implements Initializable {
     private Stage stage;

@@ -110,28 +110,6 @@ public class PertGraf extends Graf {
     }
 
     /**
-     * Create a pert graf from a pert string.
-     *
-     * @param pertString The given string.
-     * @return The created graf.
-     */
-    static PertGraf createPertGrafFromPertString(String pertString) {
-        String[] pertStringLines = pertString.split("\n");
-        Set<TaskRaw> tasks = new HashSet<>();
-
-        try {
-            for (String pertStringLine : pertStringLines) {
-                tasks.add(computePertLine(pertStringLine));
-            }
-        } catch (InvalidFormatException e) {
-            e.printStackTrace();
-            return null;
-        }
-
-        return createPertGrafFromTaskRawList(tasks);
-    }
-
-    /**
      * Creates a PertGraf instance from a set of task data.
      *
      * @param tasks the set of TaskRaw objects
@@ -251,7 +229,7 @@ public class PertGraf extends Graf {
      *
      * @return a Map associating each task:Node to the start time:Integer
      */
-    Map<Node, Integer> computeEarlyTimes() {//TODO not print start node
+    Map<Node, Integer> computeEarlyTimes() {
         Map<Node, Integer> distances = new HashMap<>();
         Task startingNode = new Task(PERT_START_NODE);
 
@@ -272,6 +250,8 @@ public class PertGraf extends Graf {
                 }
             }
         }
+
+        distances.remove(startingNode);
 
         return distances;
     }
@@ -303,6 +283,8 @@ public class PertGraf extends Graf {
                 }
             }
         }
+
+        distances.remove(startingNode);
 
         return distances;
     }
@@ -866,7 +848,7 @@ public class PertGraf extends Graf {
      * @param isRender 'true' to write DOT supported by Graphviz render, 'false' otherwise
      * @return The String object containing the DOT representation of the graph.
      */
-    private String toDotString(boolean isRender) {
+    String toDotString(boolean isRender) {
         StringBuilder sb = new StringBuilder();
 
         List<Node> lonelyNodes = getAllNodes();

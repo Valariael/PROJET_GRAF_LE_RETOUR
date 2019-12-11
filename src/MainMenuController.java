@@ -88,20 +88,6 @@ public class MainMenuController implements Initializable {
         initializeButtonListeners();
     }
 
-    //TODO
-    private void computeChangesAndSwitch(DisplayType d) {
-        switch (selectedDisplayType) {
-            case PERT_FORMAT:
-                //PertGraf.setInstance(PertGraf.createPertGrafFromPertString(textAreaDisplayGraph.getText()));
-                break;
-            case DOT_FORMAT:
-                //PertGraf.setInstance(PertGraf.createPertGrafFromDotString(textAreaDisplayGraph.getText()));
-                break;
-        }
-
-        selectedDisplayType = d;
-    }
-
     /**
      * Writes the representation of the graph in the TextArea in the selected mode.
      */
@@ -111,7 +97,7 @@ public class MainMenuController implements Initializable {
                 textAreaDisplayGraph.setText(PertGraf.getInstance().toPertString());
                 break;
             case DOT_FORMAT:
-                textAreaDisplayGraph.setText(PertGraf.getInstance().toDotString());
+                textAreaDisplayGraph.setText(PertGraf.getInstance().toDotString(true));
                 break;
             case ADJACENCY_LIST:
                 textAreaDisplayGraph.setText(PertGraf.getInstance().toString());
@@ -396,7 +382,7 @@ public class MainMenuController implements Initializable {
             alert.showAndWait();
         });
 
-        menuDFS.setOnAction(event -> {//TODO: pick starting node ?
+        menuDFS.setOnAction(event -> {
             Alert alert = new Alert(Alert.AlertType.INFORMATION);
             alert.setTitle("Computed result");
             alert.setHeaderText("Depth-First-Search result : ");
@@ -425,6 +411,7 @@ public class MainMenuController implements Initializable {
             Optional<ButtonType> result = alert.showAndWait();
             if (result.isPresent() && result.get() == buttonSave) {
                 PertGraf.setInstance((PertGraf) PertGraf.getInstance().getTransitiveClosure());
+                displayGraf();
             } else if (result.isPresent() && result.get() == buttonPNG) {
                 displayPng();
             }
@@ -569,29 +556,29 @@ public class MainMenuController implements Initializable {
      */
     private void initializeButtonListeners() {
         displayPertFormat.setOnAction(event -> {
-            computeChangesAndSwitch(DisplayType.PERT_FORMAT);
+            selectedDisplayType = DisplayType.PERT_FORMAT;
             displayGraf();
         });
 
         displayDotFormat.setOnAction(event -> {
-            computeChangesAndSwitch(DisplayType.DOT_FORMAT);
+            selectedDisplayType = DisplayType.DOT_FORMAT;
             displayGraf();
         });
 
         displayRenderFormat.setOnAction(event -> displayPng());
 
         displayAdjacendyList.setOnAction(event -> {
-            computeChangesAndSwitch(DisplayType.ADJACENCY_LIST);
+            selectedDisplayType = DisplayType.ADJACENCY_LIST;
             displayGraf();
         });
 
         displayAdjacencyMatrix.setOnAction(event -> {
-            computeChangesAndSwitch(DisplayType.ADJACENCY_MATRIX);
+            selectedDisplayType = DisplayType.ADJACENCY_MATRIX;
             displayGraf();
         });
 
         displaySuccessorArray.setOnAction(event -> {
-            computeChangesAndSwitch(DisplayType.SUCCESSOR_ARRAY);
+            selectedDisplayType = DisplayType.SUCCESSOR_ARRAY;
             displayGraf();
         });
 
@@ -601,7 +588,7 @@ public class MainMenuController implements Initializable {
         });
 
         featureAddNode.setOnAction(event -> {
-            Dialog<NewNodeInfos> dialog = new Dialog<>();
+            Dialog<TaskRaw> dialog = new Dialog<>();
             dialog.setTitle("Add a Node");
             dialog.setHeaderText("Please, fill the nodes information");
 
@@ -631,14 +618,14 @@ public class MainMenuController implements Initializable {
 
             dialog.setResultConverter(dialogButton -> {
                 if (dialogButton == confirmButtonType) {
-                    return new NewNodeInfos(nodeName.getText(), nodeLabel.getText(), nodeDuration.getValue());
+                    return new TaskRaw(nodeName.getText(), nodeLabel.getText(), nodeDuration.getValue());
                 }
                 return null;
             });
 
 
-            Optional<NewNodeInfos> result = dialog.showAndWait();
-            result.ifPresent(content -> PertGraf.getInstance().addNode(new Task(content.name, content.label, content.duration)));
+            Optional<TaskRaw> result = dialog.showAndWait();
+            result.ifPresent(content -> PertGraf.getInstance().addNode(new Task(content.getName(), content.getLabel(), content.getWeight())));
             displayGraf();
         });
 

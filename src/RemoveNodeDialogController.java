@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.ResourceBundle;
 
 /**
- * Controller class for the Remove Node interface 'remove_node_dialog.xml'.
+ * Controller class for the Remove Node interface in 'remove_node_dialog.xml'.
  */
 public class RemoveNodeDialogController implements Initializable {
     private Stage stage;
