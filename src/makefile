@@ -1,19 +1,19 @@
 JVC=javac
 sources = $(wildcard *.java)
 classes = $(sources:.java=.class)
-PRODUCT_NAME = BibliGraf
+PRODUCT_NAME = BibliGrafV2
 
 all: program jar
 
 program: $(classes)
 	
 %.class: %.java
-	$(JVC) $<
+	$(JVC) -classpath BibliGraf.jar $<
 	
 jar: $(classes)
 	@echo "Manifest-Version: 1.0" > manifest.txt
 	@echo "Class-Path: ." >> manifest.txt
-	@echo "Main-Class: Main" >> manifest.txt
+	@echo "Main-Class: UserInterface" >> manifest.txt
 	@echo "" >> manifest.txt
 	
 	jar -cmf manifest.txt $(PRODUCT_NAME).jar $(classes)

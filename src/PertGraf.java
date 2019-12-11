@@ -109,7 +109,12 @@ public class PertGraf extends Graf {
         return createPertGrafFromDotString(sb.toString());
     }
 
-    //TODO
+    /**
+     * Create a pert graf from a pert string.
+     *
+     * @param pertString The given string.
+     * @return The created graf.
+     */
     static PertGraf createPertGrafFromPertString(String pertString) {
         String[] pertStringLines = pertString.split("\n");
         Set<TaskRaw> tasks = new HashSet<>();
@@ -541,8 +546,6 @@ public class PertGraf extends Graf {
 
         return availableTasks;
     }
-
-    boolean checkPertIsTree(){return true;} //TODO implement ? or not ? or checkTaskValid
 
     /**
      * Gets the task with the highest priority from the assignable tasks according to the strategy.

@@ -137,11 +137,12 @@ public class MainMenuController implements Initializable {
     }
 
     /**
+     * Print a file choosing dialog and save the directory of the selection for later use.
      *
-     * @param fc
-     * @param saveMode
-     * @return
-     *///TODO
+     * @param fc A file chooser object.
+     * @param saveMode Indicates if the printed dialog must be a save dialog or not.
+     * @return The chosen file.
+     */
     private File chooseLocation(FileChooser fc, boolean saveMode) {
         if (savedDirectory != null && savedDirectory.exists()) {
             fc.setInitialDirectory(savedDirectory);
@@ -191,7 +192,6 @@ public class MainMenuController implements Initializable {
         Stage pngStage = new Stage();
         pngStage.setTitle("render");
         File file = new File("renders/" + tempName + ".png");
-        //file.delete();
 
         try {
             String localUrl = file.toURI().toURL().toString();
